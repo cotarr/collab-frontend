@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>collab-frontend</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="./js/main.js" defer></script>
+  </head>
+  <body>
+    <div class="head-fixed">
+      <div class="head-flex">
+        <div class="head-left header-font">
+          collab-frontend
+        </div>
+        <div class="head-right">
+          <span id="headerName"></span>
+          <span id="headerLoginButton" hidden>
+            <a href="/login"><button>Login</button></a>
+          </span>
+          <a href="/logout"><button>Logout</button></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="scrollable-div">
+
+      <h3>Mock REST API</h3>
+      <ul>
+        <li>The user (web browser) makes HTTP request containing valid session cookie.</li>
+        <li>The web server (collab-frontend) verifies session cookie</li>
+        <ul>
+          <li>if cookie not found, redirects (302) to authorizaton server.</li>
+        </ul>
+        <li>The web server (collab-frontend) performs lookup to find valid user access-token stored on behalf of user.</li>
+        <ul>
+          <li>If access-token expired, the web server (collab-frontend) uses refresh-token to obtain a new user access-token.</li>
+          <li>If no access token is found, web server performs a redirect (302) to the authorization server to get a new access-token.</li>
+        </ul>
+        <li>The web server (collab-frontend) adds access-token to HTTP authorizaton header</li>
+        <li>The web server (collab-frontend) uses HTTP proxy to forward request to backend API server</li>
+        <li>The backend (collab-backend-api) calls the <b>/introspect</b> endpoint on the authorization server to validate access-token</li>
+        <ul>
+          <li>The backend temporarily cashes token for use in repeat reqests</li>
+        </ul>
+        <li>Backend (collab-backend-api) performs simulated database lookup, returns mock data.</li>
+        <li>The web server (collab-frontend) HTTP proxy passes response to browser</li>
+        <li>The user (web borwser) displays data on screen</li>
+      </ul>
+
+
+      <div class='button-div'>
+        <button id="pumpPartsButton">Fetch Data</button>
+        <span>GET /api/v1/data/pumpparts/227</span>
+      </div>
+      <div class='button-div'>
+        <button id="pumpDataIdButton">Fetch Data</button>
+        <span>GET /api/v1/data/pumpdata/23432</span>
+      </div>
+      <div class='button-div'>
+        <button id="pumpDataAllButton">Fetch Data</button>
+        <span>GET /api/v1/data/pumpdata</span>
+      </div>
+      <div class='button-div'>
+        <button id="pumpDataNewButton">Fetch Data</button>
+        <span>POST /api/v1/data</span>
+      </div>
+      <div class='button-div'>
+        <button id="clearDisplayButton">Clear Display</button>
+      </div>
+      <div class="info-div" >
+        <pre id="apiDataText"></pre>
+        <div class="error-text" id="apiErrorText"></div>
+      </div>
+
+      <h3>Interspect Endpoint</h3>
+      <p>
+        The authorization server <b>/introspect</b> endpoint is intended for use
+        by a resource server to validate a user's access-token.
+        It returns information about the user and scope permissions.
+        This is not indended for use by the end user. It is included here
+        to show response content. The typical useful properties are: active, scope, and user.
+      </p>
+
+      <div class='button-div'>
+        <button id="introspectButton">Fetch Data</button>
+        <span>/proxy/introspect (validate access_token)</span>
+      </div>
+      <div class="info-div" >
+        <pre id="introspectText"></pre>
+        <div class="error-text" id="introspectErrorText"></div>
+      </div>
+
+      <h3>Userinfo Endpoint</h3>
+      <p>
+        The <b>/userinfo</b> endpoint is intended for use in determiing user login status.
+        The frontend web server will send the user access-token to the authorization server for validation.
+        The response includes the logged in user name for display on the page (see header above)
+      </p>
+      <div class='button-div'>
+        <button id="userinfoButton">Fetch Data</button>
+        <span>/userinfo (for update page header)</span>
+      </div>
+      <div class="info-div" >
+        <pre id="userinfoText"></pre>
+        <div class="error-text" id="userinfoErrorText"></div>
+      </div>
+
+      <h3>Site Pages</h3>
+      <ul>
+        <li><a href="/reference-links.html">/reference-links.html</a>
+          <span>RFC and repository documentation</span> </li>
+      </ul>
+
+      <h1 class="center">OAuth2</h1>
+      <div class="center">
+        <img class="image" src="images/oauth2-flow.png" alt="oath2 flow diagram" width="886" height="494">
+      </div>
+
+
+      <div class="footer">
+        Collab-frontend demo page.
+      </div>
+
+
+    <div>
+  </body>
+</html>
