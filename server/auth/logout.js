@@ -13,6 +13,9 @@ module.exports = (req, res, next) => {
   if (('authInfo' in req) && ('access_token' in req.authInfo)) {
     const fetchUrl = config.oauth2.authURL + '/token/revoke';
 
+    const clientAuth = Buffer.from(config.clientId + ':' + config.clientSecret).toString('base64');
+    console.log(clientAuth);
+
     const body = {
       access_token: req.authInfo.access_token
     };
@@ -25,7 +28,8 @@ module.exports = (req, res, next) => {
       timeout: 5000,
       headers: {
         'Content-Type': 'application/json',
-        Accept: 'application/json'
+        Accept: 'application/json',
+        Authorization: 'Basic ' + clientAuth
       },
       body: JSON.stringify(body)
     };
