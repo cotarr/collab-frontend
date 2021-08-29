@@ -39,7 +39,7 @@ const oauth2Strategy = new OAuth2Strategy(
     // passReqToCallback must be false (refresh strategy)
     passReqToCallback: false,
     // scope offline_access tells oauth2 to provide a refresh token
-    scope: ['offline_access', 'auth.read', 'api.read']
+    scope: ['offline_access', 'auth.token', 'api.read']
   },
   refreshStrategy.getOAuth2StrategyCallback()
 );
