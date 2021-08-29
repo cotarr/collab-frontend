@@ -38,7 +38,7 @@
         </ul>
         <li>The web server (collab-frontend) adds access-token to HTTP authorizaton header</li>
         <li>The web server (collab-frontend) uses HTTP proxy to forward request to backend API server</li>
-        <li>The backend (collab-backend-api) calls the <b>/introspect</b> endpoint on the authorization server to validate access-token</li>
+        <li>The backend (collab-backend-api) calls the <b>/oauth/introspect</b> endpoint on the authorization server to validate access-token</li>
         <ul>
           <li>The backend temporarily cashes token for use in repeat reqests</li>
         </ul>
@@ -74,7 +74,7 @@
 
       <h3>Interspect Endpoint</h3>
       <p>
-        The authorization server <b>/introspect</b> endpoint is intended for use
+        The authorization server <b>/oauth/introspect</b> endpoint is intended for use
         by a resource server to validate a user's access-token.
         It returns information about the user and scope permissions.
         This is not indended for use by the end user. It is included here
@@ -83,7 +83,7 @@
 
       <div class='button-div'>
         <button id="introspectButton">Fetch Data</button>
-        <span>/proxy/introspect (validate access_token)</span>
+        <span>/proxy/oauth/introspect (validate access_token)</span>
       </div>
       <div class="info-div" >
         <pre id="introspectText"></pre>

@@ -64,14 +64,14 @@ const loadCallback = (err, data) => {
   if (err) {
     document.getElementById('headerName').textContent = '';
     document.getElementById('headerLoginButton').removeAttribute('hidden');
-    window.location = '/login';
+    // window.location = '/login';
   } else if ((data) && ('name' in data)) {
     document.getElementById('headerName').textContent = data.name;
     document.getElementById('headerLoginButton').setAttribute('hidden', '');
   } else {
     document.getElementById('headerName').textContent = '';
     document.getElementById('headerLoginButton').removeAttribute('hidden');
-    window.location = '/login';
+    // window.location = '/login';
   }
 }; // loadCallback()
 
@@ -88,7 +88,7 @@ window.onload = (event) => {
 // Internal function
 // -------------------
 const fetchTokenInfo = (callback) => {
-  const fetchUrl = '/proxy/introspect';
+  const fetchUrl = '/proxy/oauth/introspect';
   const fetchOptions = {
     method: 'GET',
     timeout: 5000,

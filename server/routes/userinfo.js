@@ -6,16 +6,22 @@ const config = require('../config');
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
 const fetchIntrospect = (req, callback) => {
-  const token = req.authInfo.access_token;
-  if (token) {
-    const fetchUrl = config.oauth2.authURL + '/introspect';
+  if ((req.authInfo) && (req.authInfo.access_token)) {
+    const clientAuth = Buffer.from(config.oauth2.clientId + ':' +
+      config.oauth2.clientSecret).toString('base64');
+    const body = {
+      access_token: req.authInfo.access_token
+    };
+    const fetchUrl = config.oauth2.authURL + '/oauth/introspect';
     const fetchOptions = {
-      method: 'GET',
+      method: 'POST',
       timeout: 5000,
       headers: {
+        'Content-Type': 'application/json',
         Accept: 'application/json',
-        Authorization: 'Bearer ' + token
-      }
+        Authorization: 'Basic ' + clientAuth
+      },
+      body: JSON.stringify(body)
     };
     fetch(fetchUrl, fetchOptions)
       .then((response) => {

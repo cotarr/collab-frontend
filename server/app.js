@@ -195,7 +195,7 @@ app.get('/userinfo', passport.authenticate('main', { noredirect: true }), userin
 // Relay this from auth server back to user browser as auth demonstration
 // This info is not intended for use by end user.
 // ----------------------------------------------------------------------
-app.get('/proxy/introspect',
+app.get('/proxy/oauth/introspect',
   passport.authenticate('main', { noredirect: true }),
   introspect
 );
