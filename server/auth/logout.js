@@ -11,7 +11,7 @@ const config = require('../config');
 // ----------------------------------------------------------
 module.exports = (req, res, next) => {
   if (('authInfo' in req) && ('access_token' in req.authInfo)) {
-    const fetchUrl = config.oauth2.authURL + '/token/revoke';
+    const fetchUrl = config.oauth2.authURL + '/oauth/token/revoke';
     const clientAuth = Buffer.from(config.oauth2.clientId + ':' +
       config.oauth2.clientSecret).toString('base64');
     const body = {
