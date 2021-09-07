@@ -4,12 +4,15 @@ This is a demo repository.
 It is a mock web server using passport, passport-oauth2,
 and passport-oauth2-middleware to manage OAuth2 bearer tokens
 with a reverse proxy to read data from a mock REST API.
+It is intended for use in demonstration of repository collab-auth.
 
 This is one of 3 repositories
 
-- collab-auth (Oauth2 Authorization Provider, redirect login, tokens)
-- collab-frontend (Mock Web server, reverse proxy, html content)
-- collab-backend-api (Mock REST API using tokens to authorize requests)
+|                        Repository                                  |                   Description                         |
+| ------------------------------------------------------------------ | ----------------------------------------------------- |
+| [collab-auth](https://github.com/cotarr/collab-auth)               | Oauth2 Authorization Provider, redirect login, tokens |
+| collab-frontend                                                    | Mock Web server, reverse proxy, html content          |
+| [collab-backend-api](https://github.com/cotarr/collab-backend-api) | Mock REST API using tokens to authorize requests      |
 
 
 ### Install
@@ -22,9 +25,32 @@ npm install
 
 ```
 
+### To start the program
+
+In the development environment with NODE_ENV=development or NODE_ENV not specified,
+the application should run as-is. No configuration is necessary in development mode.
+Alternately, environment variables can be configured as listed at the end of this README
+
+```bash
+npm start
+```
+
+### To load the web page.
+
+* All three repositories must be started to use this demo.
+
+
+All files on this website are protected.
+No website files will load until the user successfully provides a username and password.
+Any unauthorized attempt to view the page will redirect the browser to the
+oauth2 authorization server. After successful entry of username and password,
+the browser will be automatically redirected back to the original web site.
+
+[http://localhost:3000](http://localhost:3000)
+
 ### Example Environment variables (showing defaults)
 
-The `.env` file is supported.
+The `.env` file is supported using `dotenv`
 
 ```
 SITE_VHOST=*
@@ -47,9 +73,4 @@ OAUTH2_MAIN_URL=http://localhost:3000
 OAUTH2_AUTH_URL=http://127.0.0.1:3500
 
 REMOTE_API_URL=http://localhost:4000
-```
-
-To start the program
-```bash
-npm start
 ```
