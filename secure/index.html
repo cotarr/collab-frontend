@@ -33,7 +33,10 @@
         <li>The user (web browser) makes HTTP request containing valid session cookie.</li>
         <li>The web server (collab-frontend) verifies session cookie</li>
         <ul>
-          <li>if cookie not found, redirects (302) to authorizaton server.</li>
+          <li>If cookie not found/verified, then user is not logged in. Redirects (302) to authorizaton server.</li>
+          <li>User enter credentials, then authorization redirects (302) back to this web page with authorization code</li>
+          <li>Browser sends authorization code from redirect response to the web server</li>
+          <li>Web server exchanges authorication code for user access token, stores token in user session on behalf of the user. </li>
         </ul>
         <li>The web server (collab-frontend) performs lookup to find valid user access-token stored on behalf of user.</li>
         <ul>
@@ -44,7 +47,7 @@
         <li>The web server (collab-frontend) uses HTTP proxy to forward request to backend API server</li>
         <li>The backend (collab-backend-api) calls the <b>/oauth/introspect</b> endpoint on the authorization server to validate access-token</li>
         <ul>
-          <li>The backend temporarily cashes token for use in repeat reqests</li>
+          <li>The backend temporarily caches token for use in repeat reqests</li>
         </ul>
         <li>Backend (collab-backend-api) performs simulated database lookup, returns mock data.</li>
         <li>The web server (collab-frontend) HTTP proxy passes response to browser</li>
@@ -54,7 +57,7 @@
 
       <div class='button-div'>
         <button id="pumpPartsButton">Fetch Data</button>
-        <span>GET /api/v1/data/pumpparts/227</span>
+        <span>GET /api/v1/data/pumpparts/227 (requires scope: &quotapi.read&quot)</span>
       </div>
       <div class='button-div'>
         <button id="pumpDataIdButton">Fetch Data</button>
@@ -66,7 +69,7 @@
       </div>
       <div class='button-div'>
         <button id="pumpDataNewButton">Fetch Data</button>
-        <span>POST /api/v1/data</span>
+        <span>POST /api/v1/data (This requires additional scope: &quotapi.write&quot)</span>
       </div>
       <div class='button-div'>
         <button id="clearDisplayButton">Clear Display</button>
