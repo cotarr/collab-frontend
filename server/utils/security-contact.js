@@ -6,7 +6,7 @@
 // In app.js:
 //     const securityContact = require('../util/security-contact');
 //     // Route for security.txt
-//     app.use(securityContact);
+//     app.get('/.well-known/security.txt', securityContact);
 //
 // ----------------------------------------------
 // Reference: https://securitytxt.org/
@@ -18,14 +18,11 @@
 // ----------------------------------------------
 'use strict';
 
-const express = require('express');
-const router = express.Router();
 const config = require('../config');
 
-router.get('/.well-known/security.txt', function (req, res, next) {
+module.exports = (req, res, next) => {
   if (config.site.securityContact.length > 0) {
-    res.set('Content-Type', 'text/plain');
-    res.send(
+    res.set('Content-Type', 'text/plain').send(
       '# Website security contact \r\n' +
       'Contact: ' + config.site.securityContact + '\r\n' +
       'Expires: ' + config.site.securityExpires + '\r\n'
@@ -33,6 +30,4 @@ router.get('/.well-known/security.txt', function (req, res, next) {
   } else {
     next();
   }
-});
-
-module.exports = router;
+};
