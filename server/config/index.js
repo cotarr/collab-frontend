@@ -4,7 +4,7 @@ const path = require('path');
 
 require('dotenv').config();
 
-const nodeEnv = process.env.NODE_ENV || 'development';
+// const nodeEnv = process.env.NODE_ENV || 'development';
 
 exports.nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 

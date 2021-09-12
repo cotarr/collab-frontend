@@ -104,6 +104,7 @@ const sessionOptions = {
   secret: config.session.secret,
   cookie: {
     path: '/',
+    // express-session takes maxAge in milliseconds
     maxAge: config.session.maxAge,
     secure: config.server.tls,
     httpOnly: true,
@@ -119,6 +120,7 @@ if (config.session.disableMemorystore) {
   sessionOptions.saveUninitialized = false;
   sessionStore.FileStore = require('session-file-store')(session);
   sessionOptions.store = new sessionStore.FileStore({
+    // session-file-store in seconds
     ttl: config.session.ttl
   });
 } else {
@@ -127,10 +129,10 @@ if (config.session.disableMemorystore) {
   sessionOptions.saveUninitialized = false;
   sessionStore.MemoryStore = require('memorystore')(session);
   sessionOptions.store = new sessionStore.MemoryStore({
-    // milliseconds
+    // memorystore in milliseconds
     ttl: config.session.maxAge,
     stale: true,
-    checkPeriod: 864000000 // prune every 24 hours
+    checkPeriod: 86400000 // prune every 24 hours
   });
 }
 app.use(session(sessionOptions));
