@@ -38,7 +38,7 @@ const oauth2Strategy = new OAuth2Strategy(
     callbackURL: config.oauth2.mainURL + '/login/callback',
     // passReqToCallback must be false (refresh strategy)
     passReqToCallback: false,
-    scope: ['api.read']
+    scope: config.oauth2.requestedScope
   },
   refreshStrategy.getOAuth2StrategyCallback()
 );
