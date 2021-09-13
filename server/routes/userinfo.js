@@ -49,10 +49,16 @@ const fetchIntrospect = (req, callback) => {
 const user = (req, res, next) => {
   fetchIntrospect(req, (err, data) => {
     if (err) {
-      console.log(err.message);
+      // console.log(err.message);
       res.json({});
     } else {
-      const user = { username: data.user.username, name: data.user.name };
+      const user = {
+        id: data.user.id,
+        number: data.user.number,
+        username: data.user.username,
+        name: data.user.name,
+        scope: data.scope
+      };
       res.json(user);
     }
   });
