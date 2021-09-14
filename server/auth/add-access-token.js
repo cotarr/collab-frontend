@@ -1,5 +1,5 @@
-const config = require('../config');
-const nodeEnv = process.env.NODE_ENV || 'development';
+// const config = require('../config');
+// const nodeEnv = process.env.NODE_ENV || 'development';
 
 /**
  * Middleware to add OAuth2 access-token to request headers

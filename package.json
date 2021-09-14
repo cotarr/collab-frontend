@@ -4,6 +4,7 @@
   "description": "",
   "main": "bin/www",
   "scripts": {
+    "lint": "npx eslint server bin/www secure/js",
     "start": "node bin/www"
   },
   "repository": {
