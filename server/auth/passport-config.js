@@ -1,14 +1,41 @@
 // -----------------------------------------------------------------
-// Passport strategy for bearer token in authorization header
+// Passport strategy for oauth2 workflow using refresh token
 //
-// req.headers {
-//    authorization: 'Bearer xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-// }
+// See docs: https://www.npmjs.com/package/passport-oauth2
+// See docs: https://www.npmjs.com/package/passport-oauth2-middleware
 //
-// Token scope added to request object in case needed in further processing
+// Default configuration in server/config/index.js can be
+// overridden using environment variables.
 //
-// req.authInfo {"scope":["xxxxx"]}  <-- From third done argument
-// req.isAuthenticated() true
+// If refresh_token supplied by authorization server,
+// then it is used automatically to get new access_token as needed.
+//
+//     Web Server     Authorization server
+//     ==========     ====================
+//     /login         /dialog/authorize (with query params)
+//                    /login
+//                    /dialog/authorize (with remembered query params)
+//                    /dialog/authorize/decision  (untrusted client)
+//     /login/callback
+//                    /oauth/token (exchange code for token)
+//     /redirect.html
+//     / (main page)
+//
+// The "scope" included in the request as a query parameter is
+// the request scope.
+//     Client allowedScope = possible user scopes allowed by client
+//     User   role         = possible user scopes
+//     Request scope       = web server limits included in query params
+//  Issued token scope is intersection of the three.
+//
+//  Example:  Client definition needs "auth.token" to issue user tokens
+//            Client needs all possible user scopes ("read", "write")
+//
+//            Client allowScope    = ["read", "write", "auth.token"]
+//            Request query params = ["read", "write"]
+//            User role            = ["read"]
+//
+//            Therefore, the issued token scope is ["read"]
 //
 // -----------------------------------------------------------------
 'use strict';

@@ -4,22 +4,10 @@
 const express = require('express');
 const proxy = require('express-http-proxy');
 const router = express.Router();
+const addAccessToken = require('../auth/add-access-token').addAccessToken;
 
 const config = require('../config');
 const nodeEnv = process.env.NODE_ENV || 'development';
-
-//
-// Add OAuth2 access-token to request headers
-//
-const addTokenMiddleware = (req, res, next) => {
-  if (('authInfo' in req) && ('access_token' in req.authInfo)) {
-    req.headers.Authorization = 'Bearer ' + req.authInfo.access_token;
-    next();
-  } else {
-    const err = new Error('Token not found');
-    next(err);
-  }
-};
 
 //
 // For added security, do not expose user's cookie to resource server
@@ -57,8 +45,14 @@ if (nodeEnv === 'production') {
   proxyOptions.rejectUnauthorized = true;
 }
 
+//
+// the /api/* routes from app.js use this router
+// Middleware addAccessToken will place access_token in request
+// as a Bearer token in Authorization header before reverse proxy.
+// The resource servers do not need to know the users cookie
+//
 router.use('/',
-  addTokenMiddleware,
+  addAccessToken,
   removeReqCookie,
   proxy(config.remote.apiURL, proxyOptions));
 
