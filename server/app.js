@@ -33,7 +33,6 @@ const securityContact = require('./utils/security-contact');
 const apiProxy = require('./routes/api-proxy');
 const userinfo = require('./routes/userinfo').user;
 const introspect = require('./routes/userinfo').introspect;
-const loggedoutPage = require('./routes/loggedout.js');
 const redirectPage = require('./routes/redirect.js');
 
 const config = require('./config');
@@ -171,13 +170,15 @@ app.get('/login/callback',
   })
 );
 
-// Logout funciton (both frontend and auth server)
-app.get('/logout', passport.authenticate('main', { noredirect: true }), logout);
-
 // -----------------------------------------------------
-// Log out confirmation( Does not requres authentication)
+// User logout route
 // -----------------------------------------------------
-app.use(loggedoutPage);
+app.get('/logout',
+  logout.skipLogoutIfNeeded,
+  passport.authenticate('main', { noredirect: true }),
+  logout.fullLogoutWithTokenRevoke
+);
+app.get('/logout.css', logout.logoutServeCss);
 
 // ----------------------------------------------------------
 // Page "/redirect.html" has timer event redirecting to "/"
