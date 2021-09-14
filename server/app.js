@@ -38,16 +38,16 @@ const redirectPage = require('./routes/redirect.js');
 const config = require('./config');
 const nodeEnv = process.env.NODE_ENV || 'development';
 
-// if (nodeEnv === 'production') {
-//   if (config.session.secret === 'Change Me') {
-//     console.error('Error, session secret must be changed for production');
-//     process.exit(1);
-//   }
-//   if (config.oauth2.clientSecret === 'ssh-secret') {
-//     console.error('Error, oauth2 client secret must be changed for production');
-//     process.exit(1);
-//   }
-// }
+if (nodeEnv === 'production') {
+  if (config.session.secret === 'Change Me') {
+    console.error('Error, session secret must be changed for production');
+    process.exit(1);
+  }
+  if (config.oauth2.clientSecret === 'ssh-secret') {
+    console.error('Error, oauth2 client secret must be changed for production');
+    process.exit(1);
+  }
+}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -222,7 +222,7 @@ app.use('/', passport.authenticate('main'), express.static(secureDir));
 // ---------------------------------
 //       T E S T   E R R O R
 // ---------------------------------
-app.use('/error', (req, res, next) => { throw new Error('Test error'); });
+app.get('/error', (req, res, next) => { throw new Error('Test error'); });
 
 // ---------------------------------
 //    E R R O R   H A N D L E R S
