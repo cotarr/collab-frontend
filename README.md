@@ -6,13 +6,14 @@ and passport-oauth2-middleware to manage OAuth2 bearer tokens
 with a reverse proxy to read data from a mock REST API.
 It is intended for use in demonstration of repository collab-auth.
 
-This is one of 3 repositories
+This is one of 4 repositories
 
 |                        Repository                                  |                   Description                         |
 | ------------------------------------------------------------------ | ----------------------------------------------------- |
-| [collab-auth](https://github.com/cotarr/collab-auth)               | Oauth2 Authorization Provider, redirect login, tokens |
-| collab-frontend                                                    | Mock Web server, reverse proxy, html content          |
+| collab-auth                                                        | Oauth2 Authorization Provider, redirect login, tokens |
+| [collab-frontend](https://github.com/cotarr/collab-frontend)       | Mock Web server, reverse proxy, HTML content          |
 | [collab-backend-api](https://github.com/cotarr/collab-backend-api) | Mock REST API using tokens to authorize requests      |
+| [collab-iot-device](https://github.com/cotarr/collab-iot-device)   | Mock IOT Device with data acquisition saved to DB     |
 
 
 ### Install
