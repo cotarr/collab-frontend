@@ -163,11 +163,27 @@ document.getElementById('apiDescriptionButton1').addEventListener('click', () =>
     document.getElementById('apiDescriptionButton1').textContent = 'Hide API Description';
   } else {
     document.getElementById('apiDescriptionDiv').setAttribute('hidden', '');
-    document.getElementById('apiDescriptionButton1').textContent = 'Show APIDescription';
+    document.getElementById('apiDescriptionButton1').textContent = 'Show API Description';
   }
 });
 
 document.getElementById('apiDescriptionButton2').addEventListener('click', () => {
   document.getElementById('apiDescriptionDiv').setAttribute('hidden', '');
   document.getElementById('apiDescriptionButton1').textContent = 'Show API Description';
+});
+//
+// Show or Web Server panels
+document.getElementById('webDescriptionButton1').addEventListener('click', () => {
+  if (document.getElementById('webDescriptionDiv').hasAttribute('hidden')) {
+    document.getElementById('webDescriptionDiv').removeAttribute('hidden');
+    document.getElementById('webDescriptionButton1').textContent = 'Hide Web Server Description';
+  } else {
+    document.getElementById('webDescriptionDiv').setAttribute('hidden', '');
+    document.getElementById('webDescriptionButton1').textContent = 'Show Web Server Description';
+  }
+});
+
+document.getElementById('webDescriptionButton2').addEventListener('click', () => {
+  document.getElementById('webDescriptionDiv').setAttribute('hidden', '');
+  document.getElementById('webDescriptionButton1').textContent = 'Show Web Server Description';
 });

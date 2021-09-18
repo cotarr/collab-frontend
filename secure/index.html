@@ -26,7 +26,7 @@
     <div class="scrollable-div">
 
       <div class="center">
-        <img class="image" src="images/home-network-oauth2.png" alt="home network oauth2 network" width="1046" height="548">
+        <img class="image" src="images/home-network-oauth2.png" alt="home network oauth2 network" width="1010" height="587">
       </div>
 
       <h3>Mock IOT Devices</h3>
@@ -144,6 +144,21 @@
       <div id=apiDescriptionDiv hidden>
         <div class="description-contents">
           <ul>
+
+        </div>
+        <div class='button-div'>
+          <button id="apiDescriptionButton2">Hide API Description</button>
+        </div>
+      </div>
+
+
+      <h3>Web Server</h3>
+      <div class='button-div'>
+        <button id="webDescriptionButton1">Show Web Server Description</button>
+      </div>
+      <div id=webDescriptionDiv hidden>
+        <div class="description-contents">
+          <ul>
             <li>The user (web browser) makes HTTP request containing valid session cookie.</li>
             <li>The web server (collab-frontend) verifies session cookie</li>
             <ul>
@@ -167,12 +182,13 @@
             <li>The web server (collab-frontend) HTTP proxy passes response to browser</li>
             <li>The user (web borwser) displays data on screen</li>
           </ul>
-        </div>
-        <div class='button-div'>
-          <button id="apiDescriptionButton2">Hide API Description</button>
+          <div class='button-div'>
+            <button id="webDescriptionButton2">Hide Web Server Description</button>
+          </div>
         </div>
       </div>
 
+      <h3>Try the API</h3>
       <div class='button-div'>
         <button id="iotDataButton">Fetch Data</button>
         <span>GET /api/v1/iot-data/</span>
