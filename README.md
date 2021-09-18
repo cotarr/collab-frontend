@@ -51,7 +51,7 @@ the browser will be automatically redirected back to the original web site.
 
 ### Example Environment variables (showing defaults)
 
-The `.env` file is supported using `dotenv`
+The `.env` file is supported using dotenv npm package
 
 ```
 SITE_VHOST=*

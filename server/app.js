@@ -31,8 +31,8 @@ const securityContact = require('./utils/security-contact');
 
 // Route Handlers
 const apiProxy = require('./routes/api-proxy');
-const userinfo = require('./routes/userinfo').user;
-const introspect = require('./routes/userinfo').introspect;
+const userinfo = require('./routes/introspect').user;
+const introspect = require('./routes/introspect').introspect;
 const redirectPage = require('./routes/redirect.js');
 
 const config = require('./config');

@@ -5,6 +5,7 @@
     <title>collab-frontend</title>
     <link rel="stylesheet" href="css/styles.css">
     <script src="./js/main.js" defer></script>
+    <script src="./js/api-data.js" defer></script>
   </head>
   <body>
     <div class="head-fixed">
@@ -28,48 +29,153 @@
         <img class="image" src="images/home-network-oauth2.png" alt="home network oauth2 network" width="1046" height="548">
       </div>
 
+      <h3>Mock IOT Devices</h3>
+      <div class='button-div'>
+        <button id="iotDescriptionButton1">Show IOT Description</button>
+      </div>
+      <div id=iotDescriptionDiv hidden>
+        <div class="description-contents">
+          <p>
+            This demonstration is aimed toward using IOT devices on a home network.
+            One example would be a Raspberry Pi located at various places around the house.
+            Each Pi may have various sensors, such a outdoor temperature or refrigerator temperature.
+            For this demonstration 3 temperatures are being emulated.
+            A random number generator produces simulated temperatures.
+            New emulated data is generated once per minute.
+            The emulated IOT device produces JSON encoded data that would look like this:
+          </p>
+<pre class="info-div">
+{
+  "deviceId": "iot-device-12",
+  "timestamp": "2021-09-17T15:32:08.417Z",
+  "data1": 24.831,
+  "data2": 27.241,
+  "data3": 22.307
+},
+</pre>
+          <p>
+            IOT devices are automated machine devices that operate continuously.
+            The use of a user login and password is impractical for security
+            reasons, because each of multiple devices would need to store the user's password.
+            OAuth2 allows IOT devices operate under their own authority without a user.
+            Oauth2 supports a token grant type called &quot;Client Credentials&quot grant.
+            This type of token is sometimes called a machine token, as opposed to a user token.
+            Before an IOT device can use this method, a client record must be created
+            in the oauth2 authorization server. The client_id and client_secret are then
+            placed in the configuration of the IOT device.
+          </p>
+          <p>
+            Looking at the diagram above, it can be seen that the database API resource server
+            requires a valid access_token to read or write data to the database.
+            Therefore, the IOT device must obtain a new valid oauth2 access_token.
+            The IOT device contacts the authorization server over the network.
+            Using the IOT device's client credentials, the IOT device will request a new
+            access token using client credentials grant type. Upon receipt of the token,
+            the IOT device can gain access to the database API server.
+          </p>
+          <p>
+            This implementation also supports token scope.
+            A database may include multiple different tables.
+            It is useful to provide further granularity so access can be restricted differently
+            for each database table.
+            This is done by assigning a scope value to the token,
+            such as api.read, api.write, or api.admin.
+            The &quot;api.write&quot; is the intended scope this for this demo.
+          </p>
+          <p>
+            A second scope is also needed for the authorization server to specificity
+            the type of token interactions that are allowed to issue token or inquire
+            token validity. The authorization server in this case accepts possible scopes of
+            auth.info, auth.token, auth.client.
+            The &quot;auth.client&quot; designates that the authorization server can
+            issue tokens directly to a client based on the clientId and
+            scope, without association with a specific user login.
+          </p>
+          <ul>
+            <li>&quot;api.write&quot; - Provides access to API routes that allow this scope</li>
+            <li>&quot;token.client&quot; - Permits the authentication sever to issue client access_tokens.
+          </ul>
+          <p>
+            The Raspberry Pi or other IOT device would then perform the following steps:
+          </p>
+          <ul>
+            <li>A cycle timer is created to trigger data acquisition at fixed intervals</li>
+            <li>Timer event triggers the IOT device to collect data from it's sensors</li>
+            <li>The IOT device checks it's token cache to see if has a non-expired access token</li>
+            <ul>
+              <li>If necessary, the IOT device requests a new access_token</li>
+              <li>The new access token is stored in the token cache along with it's expiration time.</li>
+            </ul>
+            <li>An HTTP POST request is prepared for transmission to the API database server</li>
+            <li>The access token is attached to the HTTP request Authorization header as a Bearer token.</li>
+            <li>The POST request is sent to the API.</li>
+            <ul>
+              <li>The expected HTTP response status is 201 (Created)</li>
+              <li>401 Unauthorized response indicates the token is likely expired or otherwise invalid.</li>
+              <li>403 Forbidden response indicated the client credentials do not have sufficient scope.</li>
+            </ul>
+          </ul>
+          <p>
+            Typically the API may add additional default values to the record, such as record ID and timestamps.
+            The record is returned to the IOT device in the body of the post request as follows.
+          </p>
+<pre class="info-div">
+{
+  "id": 1277,
+  "deviceId": "iot-device-12",
+  "timestamp": "2021-09-17T15:32:08.417Z",
+  "data1": 24.831,
+  "data2": 27.241,
+  "data3": 22.307
+  "updatedAt": "2021-09-17T15:33:07.797Z",
+  "createdAt": "2021-09-17T15:33:07.797Z"
+},
+</pre>
+        </div>
+        <div class='button-div'>
+          <button id="iotDescriptionButton2">Hide IOT Description</button>
+        </div>
+      </div>
+
       <h3>Mock REST API</h3>
-      <ul>
-        <li>The user (web browser) makes HTTP request containing valid session cookie.</li>
-        <li>The web server (collab-frontend) verifies session cookie</li>
-        <ul>
-          <li>If cookie not found/verified, then user is not logged in. Redirects (302) to authorizaton server.</li>
-          <li>User enter credentials, then authorization redirects (302) back to this web page with authorization code</li>
-          <li>Browser sends authorization code from redirect response to the web server</li>
-          <li>Web server exchanges authorication code for user access token, stores token in user session on behalf of the user. </li>
-        </ul>
-        <li>The web server (collab-frontend) performs lookup to find valid user access-token stored on behalf of user.</li>
-        <ul>
-          <li>If access-token expired, the web server (collab-frontend) uses refresh-token to obtain a new user access-token.</li>
-          <li>If no access token is found, web server performs a redirect (302) to the authorization server to get a new access-token.</li>
-        </ul>
-        <li>The web server (collab-frontend) adds access-token to HTTP authorizaton header</li>
-        <li>The web server (collab-frontend) uses HTTP proxy to forward request to backend API server</li>
-        <li>The backend (collab-backend-api) calls the <b>/oauth/introspect</b> endpoint on the authorization server to validate access-token</li>
-        <ul>
-          <li>The backend temporarily caches token for use in repeat reqests</li>
-        </ul>
-        <li>Backend (collab-backend-api) performs simulated database lookup, returns mock data.</li>
-        <li>The web server (collab-frontend) HTTP proxy passes response to browser</li>
-        <li>The user (web borwser) displays data on screen</li>
-      </ul>
+      <div class='button-div'>
+        <button id="apiDescriptionButton1">Show API Description</button>
+      </div>
+      <div id=apiDescriptionDiv hidden>
+        <div class="description-contents">
+          <ul>
+            <li>The user (web browser) makes HTTP request containing valid session cookie.</li>
+            <li>The web server (collab-frontend) verifies session cookie</li>
+            <ul>
+              <li>If cookie not found/verified, then user is not logged in. Redirects (302) to authorizaton server.</li>
+              <li>User enter credentials, then authorization redirects (302) back to this web page with authorization code</li>
+              <li>Browser sends authorization code from redirect response to the web server</li>
+              <li>Web server exchanges authorization code for user access token, stores token in user session on behalf of the user. </li>
+            </ul>
+            <li>The web server (collab-frontend) performs lookup to find valid user access-token stored on behalf of user.</li>
+            <ul>
+              <li>If access-token expired, the web server (collab-frontend) uses refresh-token to obtain a new user access-token.</li>
+              <li>If no access token is found, web server performs a redirect (302) to the authorization server to get a new access-token.</li>
+            </ul>
+            <li>The web server (collab-frontend) adds access-token to HTTP authorization header</li>
+            <li>The web server (collab-frontend) uses HTTP proxy to forward request to backend API server</li>
+            <li>The backend (collab-backend-api) calls the <b>/oauth/introspect</b> endpoint on the authorization server to validate access-token</li>
+            <ul>
+              <li>The backend temporarily caches token for use in repeat reqests</li>
+            </ul>
+            <li>Backend (collab-backend-api) performs simulated database lookup, returns mock data.</li>
+            <li>The web server (collab-frontend) HTTP proxy passes response to browser</li>
+            <li>The user (web borwser) displays data on screen</li>
+          </ul>
+        </div>
+        <div class='button-div'>
+          <button id="apiDescriptionButton2">Hide API Description</button>
+        </div>
+      </div>
 
-
       <div class='button-div'>
-        <button id="pumpPartsButton">Fetch Data</button>
-        <span>GET /api/v1/data/pumpparts/227 (requires scope: &quotapi.read&quot)</span>
-      </div>
-      <div class='button-div'>
-        <button id="pumpDataIdButton">Fetch Data</button>
-        <span>GET /api/v1/data/pumpdata/23432</span>
-      </div>
-      <div class='button-div'>
-        <button id="pumpDataAllButton">Fetch Data</button>
-        <span>GET /api/v1/data/pumpdata</span>
-      </div>
-      <div class='button-div'>
-        <button id="pumpDataNewButton">Fetch Data</button>
-        <span>POST /api/v1/data (This requires additional scope: &quotapi.write&quot)</span>
+        <button id="iotDataButton">Fetch Data</button>
+        <span>GET /api/v1/iot-data/</span>
       </div>
       <div class='button-div'>
         <button id="clearDisplayButton">Clear Display</button>
@@ -80,17 +186,19 @@
       </div>
 
       <h3>Interspect Endpoint</h3>
-      <p>
-        The authorization server <b>/oauth/introspect</b> endpoint is intended for use
-        by a resource server to validate a user's access-token.
-        It returns information about the user and scope permissions.
-        This is not indended for use by the end user. It is included here
-        to show response content. The typical useful properties are: active, scope, and user.
-      </p>
+      <div class="description-contents">
+        <p>
+          The authorization server <b>/oauth/introspect</b> endpoint is intended for use
+          by a resource server to validate a user's access-token.
+          It returns information about the user and scope permissions.
+          This is not intended for use by the end user. It is included here
+          to show response content. The typical useful properties are: active, scope, and user.
+        </p>
+      </div>
 
       <div class='button-div'>
         <button id="introspectButton">Fetch Data</button>
-        <span>/proxy/oauth/introspect (validate access_token)</span>
+        <span>/proxy/oauth/introspect</span>
       </div>
       <div class="info-div" >
         <pre id="introspectText"></pre>
@@ -98,11 +206,13 @@
       </div>
 
       <h3>Userinfo Endpoint</h3>
-      <p>
-        The <b>/userinfo</b> endpoint is intended for use in determiing user login status.
-        The frontend web server will send the user access-token to the authorization server for validation.
-        The response includes the logged in user name for display on the page (see header above)
-      </p>
+        <div class="description-contents">
+        <p>
+          The <b>/userinfo</b> endpoint is intended for use in determining user login status.
+          The frontend web server will send the user access-token to the authorization server for validation.
+          The response includes the logged in user name for display on the page (see header above)
+        </p>
+      </div>
       <div class='button-div'>
         <button id="userinfoButton">Fetch Data</button>
         <span>/userinfo (for update page header)</span>

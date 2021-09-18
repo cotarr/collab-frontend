@@ -138,118 +138,36 @@ document.getElementById('introspectButton').addEventListener('click', () => {
   fetchTokenInfo(callback);
 });
 
-// -------------------
-// Internal function
-// -------------------
-const getTestApiData = (endpointUrl) => {
-  const fetchUrl = endpointUrl;
-  const fetchOptions = {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json'
-    }
-  };
-  fetch(fetchUrl, fetchOptions)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        let errorString = 'Fetch status ' + response.status + ' ' +
-          fetchOptions.method + ' ' + fetchUrl;
-        // On token failure, an OAuth2 API should provide a WWW-Authentication header
-        // If WWW-Authentication header is present, append it.
-        const wwwAuthenticateHeader = response.headers.get('WWW-Authenticate');
-        if (wwwAuthenticateHeader) {
-          errorString += ' WWW-Authenticate header: ' + wwwAuthenticateHeader;
-        }
-        throw new Error(errorString);
-      }
-    })
-    .then((json) => {
-      // console.log(JSON.stringify(json, null, 2));
-      document.getElementById('apiDataText').textContent = JSON.stringify(json, null, 2);
-      document.getElementById('apiErrorText').textContent = '';
-    })
-    .catch((err) => {
-      console.log(err);
-      document.getElementById('apiDataText').textContent = '';
-      document.getElementById('apiErrorText').textContent = err.message;
-    });
-}; // getTestApiData()
-
-// -------------------------------
-// Dummy data for POST request
-// -------------------------------
-const dummyData = {
-  pumpId: 'FA0221',
-  status: 'running',
-  pumpRpm: 1802,
-  suctionPsi: 8.1,
-  dischargePsi: 84.1,
-  flowGpm: 81.2,
-  motorAmps: 27.4,
-  motorTempF: 57.4
-};
-
-// -------------------
-// Internal function
-// -------------------
-const postTestApiData = (endpointUrl, dataObj) => {
-  const fetchUrl = endpointUrl;
-  const fetchOptions = {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(dataObj)
-  };
-  fetch(fetchUrl, fetchOptions)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        let errorString = 'Fetch status ' + response.status + ' ' +
-          fetchOptions.method + ' ' + fetchUrl;
-        // On token failure, an OAuth2 API should provide a WWW-Authentication header
-        // If WWW-Authentication header is present, append it.
-        const wwwAuthenticateHeader = response.headers.get('WWW-Authenticate');
-        if (wwwAuthenticateHeader) {
-          errorString += ' WWW-Authenticate header: ' + wwwAuthenticateHeader;
-        }
-        throw new Error(errorString);
-      }
-    })
-    .then((json) => {
-      // console.log(JSON.stringify(json, null, 2));
-      document.getElementById('apiDataText').textContent = JSON.stringify(json, null, 2);
-      document.getElementById('apiErrorText').textContent = '';
-    })
-    .catch((err) => {
-      console.log(err);
-      document.getElementById('apiDataText').textContent = '';
-      document.getElementById('apiErrorText').textContent = err.message;
-    });
-}; // postTestApiData()
-
-// ---------------------------------------------
-// Event handlers for buttons, mock API requests
-// ---------------------------------------------
-document.getElementById('pumpPartsButton').addEventListener('click', () => {
-  getTestApiData('/api/v1/data/pumpparts/227');
-});
-document.getElementById('pumpDataIdButton').addEventListener('click', () => {
-  getTestApiData('/api/v1/data/pumpdata/23432');
-});
-document.getElementById('pumpDataAllButton').addEventListener('click', () => {
-  getTestApiData('/api/v1/data/pumpdata');
+//
+// Show or hide IOT panels
+//
+document.getElementById('iotDescriptionButton1').addEventListener('click', () => {
+  if (document.getElementById('iotDescriptionDiv').hasAttribute('hidden')) {
+    document.getElementById('iotDescriptionDiv').removeAttribute('hidden');
+    document.getElementById('iotDescriptionButton1').textContent = 'Hide IOT Description';
+  } else {
+    document.getElementById('iotDescriptionDiv').setAttribute('hidden', '');
+    document.getElementById('iotDescriptionButton1').textContent = 'Show IOT Description';
+  }
 });
 
-document.getElementById('pumpDataNewButton').addEventListener('click', () => {
-  postTestApiData('/api/v1/data/pumpdata', dummyData);
+document.getElementById('iotDescriptionButton2').addEventListener('click', () => {
+  document.getElementById('iotDescriptionDiv').setAttribute('hidden', '');
+  document.getElementById('iotDescriptionButton1').textContent = 'Show IOT Description';
+});
+//
+// Show or hide API panels
+document.getElementById('apiDescriptionButton1').addEventListener('click', () => {
+  if (document.getElementById('apiDescriptionDiv').hasAttribute('hidden')) {
+    document.getElementById('apiDescriptionDiv').removeAttribute('hidden');
+    document.getElementById('apiDescriptionButton1').textContent = 'Hide API Description';
+  } else {
+    document.getElementById('apiDescriptionDiv').setAttribute('hidden', '');
+    document.getElementById('apiDescriptionButton1').textContent = 'Show APIDescription';
+  }
 });
 
-document.getElementById('clearDisplayButton').addEventListener('click', () => {
-  document.getElementById('apiDataText').textContent = '';
-  document.getElementById('apiErrorText').textContent = '';
+document.getElementById('apiDescriptionButton2').addEventListener('click', () => {
+  document.getElementById('apiDescriptionDiv').setAttribute('hidden', '');
+  document.getElementById('apiDescriptionButton1').textContent = 'Show API Description';
 });
