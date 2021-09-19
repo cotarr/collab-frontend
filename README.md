@@ -1,6 +1,6 @@
 # colab-frontend
 
-This is 1 of 4 repositories used on a collaboration project for learning oauth2orize and passport.
+This is 2 of 4 repositories used on a collaboration project for learning oauth2orize and passport.
 This repository is a mock web server using passport strategy passport-oauth2
 and middleware passport-oauth2-middleware.
 The web server emulates a personal web page that would require user authentication to view the page
