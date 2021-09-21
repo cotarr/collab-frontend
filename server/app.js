@@ -120,7 +120,8 @@ if (config.session.disableMemorystore) {
   sessionStore.FileStore = require('session-file-store')(session);
   sessionOptions.store = new sessionStore.FileStore({
     // session-file-store in seconds
-    ttl: config.session.ttl
+    ttl: config.session.ttl,
+    retries: 0
   });
 } else {
   console.log('Using memorystore for session storage');
@@ -164,10 +165,14 @@ app.get('/login', passport.authenticate('oauth2'));
 // An auth server redirect back with "/login/callback?error=access_denied"
 // will issue standard 401 Unauthorized unless failureRedirect URL is defined.
 //
+// app.get('/login/callback',
+//   passport.authenticate('oauth2', {
+//     successReturnToOrRedirect: '/redirect.html'
+//   })
+// );
 app.get('/login/callback',
-  passport.authenticate('oauth2', {
-    successReturnToOrRedirect: '/redirect.html'
-  })
+  passport.authenticate('oauth2'),
+  (req, res) => { res.redirect('/redirect.html'); }
 );
 
 // -----------------------------------------------------
@@ -217,7 +222,7 @@ app.get('/secure',
 // -------------------------------
 const secureDir = path.join(__dirname, '../secure');
 console.log('Serving files from: ' + secureDir);
-app.use('/', passport.authenticate('main'), express.static(secureDir));
+app.use(passport.authenticate('main'), express.static(secureDir));
 
 // ---------------------------------
 //       T E S T   E R R O R
