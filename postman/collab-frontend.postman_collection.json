@@ -1,0 +1,695 @@
+{
+	"info": {
+		"_postman_id": "1a07a093-b720-4991-986d-5f524a7356de",
+		"name": "collab-frontend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/logout (clear localhost cookies)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// The domain 127.0.0.1 must be whitelisted in postman to avoid error:",
+							"// \"CookieStore: programmatic access to \"localhost\" is denied\"}",
+							"const jar = pm.cookies.jar();",
+							"jar.clear('localhost', (err) => {",
+							"    if (err) console.log(err);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/logout",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/ (redirect /login)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /login\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    pm.expect(location).to.equal('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{frontend_host}}/",
+					"host": [
+						"{{frontend_host}}"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/login (redirect auth server)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is {{auth_host}}/dialog/authorize\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    let expectURL = pm.environment.get('auth_host') + '/dialog/authorize'",
+							"    pm.expect(location).to.equal(expectURL);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{frontend_host}}/login",
+					"host": [
+						"{{frontend_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(auth-1) /dialog/authorize 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Redirect address is /login\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    pm.expect(location).to.equal('/login')",
+							"});",
+							"",
+							"// Case of untrusted client",
+							"pm.test('Extract transaction code', function () {",
+							"  // get response body as string (find the one with the nonce)",
+							"  let arrayOfQuotedStrings = pm.response.text().split('\\\"')",
+							"  //console.log(JSON.stringify(arrayOfQuotedStrings, null, 2));",
+							"  let transactionIdIndex = arrayOfQuotedStrings.indexOf('transaction_id');",
+							"  // console.log('transactionIdIndex ' + transactionIdIndex);",
+							"  if (transactionIdIndex > 0) {",
+							"      let transactionIdValue = arrayOfQuotedStrings[transactionIdIndex + 4];",
+							"      // console.log('transactionIdValue ' + transactionIdValue);",
+							"      pm.globals.set('transaction_id', transactionIdValue);",
+							"  } else {",
+							"      pm.globals.set('transaction_id', '');",
+							"  }",
+							"});",
+							"",
+							"// case of already have user cookie with trusted client",
+							"pm.test(\"Extrace authorization code from redirect URI\", function () {",
+							"    let authCode = pm.response.headers.get('Location').split('=')[1];",
+							"    if (authCode) {",
+							"      pm.globals.set('auth_code', authCode)",
+							"    } else {",
+							"        pm.globals.set('auth_code', '');",
+							"    }",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"dialog",
+						"authorize"
+					],
+					"query": [
+						{
+							"key": "redirect_uri",
+							"value": "{{redirect_uri}}"
+						},
+						{
+							"key": "response_type",
+							"value": "code"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}"
+						},
+						{
+							"key": "scope",
+							"value": "{{scopes}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(auth-2) /login (form)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(auth-3) login (username, password)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /dialog/authorize\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    pm.expect(location).to.equal('/dialog/authorize');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{user_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{user_password}}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(auth-4) /dialog/authorize 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Case of untrusted client",
+							"pm.test('Extract transaction code', function () {",
+							"  // get response body as string (find the one with the nonce)",
+							"  let arrayOfQuotedStrings = pm.response.text().split('\\\"')",
+							"  //console.log(JSON.stringify(arrayOfQuotedStrings, null, 2));",
+							"  let transactionIdIndex = arrayOfQuotedStrings.indexOf('transaction_id');",
+							"  // console.log('transactionIdIndex ' + transactionIdIndex);",
+							"  if (transactionIdIndex > 0) {",
+							"      let transactionIdValue = arrayOfQuotedStrings[transactionIdIndex + 4];",
+							"      // console.log('transactionIdValue ' + transactionIdValue);",
+							"      pm.globals.set('transaction_id', transactionIdValue);",
+							"  } else {",
+							"      pm.globals.set('transaction_id', '');",
+							"      // If client property trustedClient = true, decision step is skipped",
+							"      postman.setNextRequest('/oauth/token (auth code)')",
+							"  }",
+							"});",
+							"",
+							"// Case of trusted client",
+							"pm.test(\"Extrace authorization code from redirect URI\", function () {",
+							"    let authCode = null;",
+							"    let locationHeader = pm.response.headers.get('Location');",
+							"    if (locationHeader) {",
+							"      authCode = locationHeader.split('=')[1];",
+							"    }",
+							"    if (authCode) {",
+							"      pm.globals.set('auth_code', authCode)",
+							"    } else {",
+							"        pm.globals.set('auth_code', '');",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"dialog",
+						"authorize"
+					],
+					"query": [
+						{
+							"key": "redirect_uri",
+							"value": "{{redirect_uri}}"
+						},
+						{
+							"key": "response_type",
+							"value": "code"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}"
+						},
+						{
+							"key": "scope",
+							"value": "{{scopes}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(auth-5) /dialog/authorize/decision (untrusted)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Extrace authorization code from redirect URI\", function () {",
+							"    let authCode = null;",
+							"    let locationHeader = pm.response.headers.get('Location');",
+							"    if (locationHeader) {",
+							"      authCode = locationHeader.split('=')[1];",
+							"    }",
+							"    if (authCode) {",
+							"      pm.globals.set('auth_code', authCode)",
+							"    } else {",
+							"        pm.globals.set('auth_code', '');",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "transaction_id",
+							"value": "{{transaction_id}}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{auth_host}}/dialog/authorize/decision",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"dialog",
+						"authorize",
+						"decision"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/oauth/token (auth code)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /login\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    pm.expect(location).to.equal('/redirect.html');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{frontend_host}}/login/callback?code={{auth_code}}",
+					"host": [
+						"{{frontend_host}}"
+					],
+					"path": [
+						"login",
+						"callback"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "{{auth_code}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/ (with valid cookie)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include('<title>collab-frontend</title>');",
+							"});",
+							"",
+							"",
+							"// const jar = pm.cookies.jar();",
+							"// jar.getAll('localhost', (err, cookies) => {",
+							"//     if (err) {",
+							"//         console.log(err);",
+							"//     } else {",
+							"//         console.log(cookies);",
+							"//     }",
+							"// });",
+							"",
+							"// console.log(pm.cookies.has('collab-frontend-sid'))"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{frontend_host}}/",
+					"host": [
+						"{{frontend_host}}"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/v1/data/iot-data/",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{frontend_host}}/api/v1/data/iot-data",
+					"host": [
+						"{{frontend_host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"iot-data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/status (clear localhost cookies)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// The domain 127.0.0.1 must be whitelisted in postman to avoid error:",
+							"// \"CookieStore: programmatic access to \"localhost\" is denied\"}",
+							"const jar = pm.cookies.jar();",
+							"jar.clear('localhost', (err) => {",
+							"    if (err) console.log(err);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/status",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/ (not logged in, redirect)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /login\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    pm.expect(location).to.equal('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{frontend_host}}/",
+					"host": [
+						"{{frontend_host}}"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/v1/data/iot-data/ (401)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{frontend_host}}/api/v1/data/iot-data",
+					"host": [
+						"{{frontend_host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"iot-data"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
