@@ -39,7 +39,8 @@ exports.oauth2 = {
   clientSecret: process.env.OAUTH2_CLIENT_SECRET || 'ssh-secret',
   mainURL: process.env.OAUTH2_MAIN_URL || 'http://localhost:3000',
   authURL: process.env.OAUTH2_AUTH_URL || 'http://127.0.0.1:3500',
-  requestedScope: process.env.OAUTH2_REQUESTED_SCOPE || ['api.read', 'api.write']
+  requestedScope: JSON.parse(process.env.OAUTH2_REQUESTED_SCOPE ||
+    '["api.read", "api.write"]')
 
 };
 
