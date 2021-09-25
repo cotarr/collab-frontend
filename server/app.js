@@ -97,7 +97,7 @@ app.use(checkVhost.rejectNotVhost);
 // -----------------------------------------------------------------
 
 const sessionOptions = {
-  name: 'collab-frontend-sid',
+  name: 'collab-frontend.sid',
   proxy: false,
   rolling: true,
   secret: config.session.secret,
@@ -185,6 +185,13 @@ app.get('/logout',
 );
 app.get('/logout.css', logout.logoutServeCss);
 
+// ---------------------------------------------------------
+// Redirect user to authorization server to change password
+// ---------------------------------------------------------
+app.get('/changepassword',
+  (req, res) => { res.redirect(config.oauth2.authURL + '/changepassword'); }
+);
+
 // ----------------------------------------------------------
 // Page "/redirect.html" has timer event redirecting to "/"
 // This is a workaround to address issue where main page "/"
@@ -197,7 +204,10 @@ app.use(redirectPage);
 // --------------------
 //     API routes
 // --------------------
-app.get('/userinfo', passport.authenticate('main', { noredirect: true }), userinfo);
+app.get('/userinfo',
+  passport.authenticate('main', { noredirect: true }),
+  userinfo
+);
 
 // ----------------------------------------------------------------------
 // Relay this from auth server back to user browser as auth demonstration
@@ -209,13 +219,18 @@ app.get('/proxy/oauth/introspect',
 );
 
 // Mock REST API
-app.use('/api', passport.authenticate('main', { noredirect: true }), apiProxy);
+app.use('/api',
+  passport.authenticate('main', { noredirect: true }),
+  apiProxy
+);
 
 // -----------------------
 // Authenticated status
 // -----------------------
 app.get('/secure',
-  passport.authenticate('main', { noredirect: true }), (req, res) => res.json({ secure: 'ok' }));
+  passport.authenticate('main', { noredirect: true }),
+  (req, res) => res.json({ secure: 'ok' })
+);
 
 // -------------------------------
 // Web server for static files

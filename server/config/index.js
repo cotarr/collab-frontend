@@ -23,13 +23,13 @@ exports.server = {
   serverTlsCert: process.env.SERVER_TLS_CERT ||
     path.join(__dirname, './server/certs/certificate.pem'),
   tls: (process.env.SERVER_TLS === 'true') || false,
-  port: process.env.SERVER_PORT || 3000,
+  port: parseInt(process.env.SERVER_PORT || '3000'),
   pidFilename: process.env.SERVER_PID_FILENAME || ''
 };
 
 exports.session = {
-  maxAge: (process.env.SESSION_EXPIRE_SEC * 1000) || (7 * 24 * 3600000),
-  ttl: process.env.SESSION_EXPIRE_SEC || (7 * 24 * 3600),
+  maxAge: parseInt(process.env.SESSION_EXPIRE_SEC || '604800') * 1000,
+  ttl: parseInt(process.env.SESSION_EXPIRE_SEC || '608400'),
   secret: process.env.SESSION_SECRET || 'Change Me',
   disableMemorystore: (process.env.SESSION_DISABLE_MEMORYSTORE === 'true') || false
 };

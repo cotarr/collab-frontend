@@ -204,11 +204,16 @@
       <h3>Interspect Endpoint</h3>
       <div class="description-contents">
         <p>
-          The authorization server <b>/oauth/introspect</b> endpoint is intended for use
-          by a resource server to validate a user's access-token.
-          It returns information about the user and scope permissions.
+          This button is for demonstration purposes only.
+          Normally a user would never possess an actual access_token, and
+          therefore never have the need to validate a token.
+          In the frontend web server, there is temporary development route
+          &quot;/proxy/oauth/introspect&quot that will fetch from
+          &quot;/oauth/introspect&quot; on the authorization server.
+          It returns information about the access_token that is stored in the web server
+          on the users behalf.
           This is not intended for use by the end user. It is included here
-          to show response content. The typical useful properties are: active, scope, and user.
+          to show response content. The typical useful properties are: <b>active, scope, and user</b>.
         </p>
       </div>
 
@@ -238,17 +243,23 @@
         <div class="error-text" id="userinfoErrorText"></div>
       </div>
 
-      <h3>Site Pages</h3>
-      <ul>
-        <li><a href="/reference-links.html">/reference-links.html</a>
-          <span>RFC and repository documentation</span> </li>
-      </ul>
+      <h3>User Password Change</h3>
+        <div class="description-contents">
+        <p>
+          A web page will typically include a link that the user may use to
+          change their user password. In this case, the frontend web server
+          will accept the /changepassword route and redirect (302) to the
+          authorization server.
+        </p>
+      </div>
+      <div class='button-div'>
+        <a href="/changepassword"><button>Change Password</button></a>
+        <span>/changepassword will redirect to authorization server.</span>
+      </div>
 
       <div class="footer">
         Collab-frontend demo page.
       </div>
-
-
     <div>
   </body>
 </html>
