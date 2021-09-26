@@ -16,10 +16,8 @@ exports.site = {
 };
 
 exports.server = {
-  serverTlsKey: process.env.SERVER_TLS_KEY ||
-    path.join(__dirname, './server/certs/privatekey.pem'),
-  serverTlsCert: process.env.SERVER_TLS_CERT ||
-    path.join(__dirname, './server/certs/certificate.pem'),
+  serverTlsKey: process.env.SERVER_TLS_KEY || '',
+  serverTlsCert: process.env.SERVER_TLS_CERT || '',
   tls: (process.env.SERVER_TLS === 'true') || false,
   port: parseInt(process.env.SERVER_PORT || '3000'),
   pidFilename: process.env.SERVER_PID_FILENAME || ''
