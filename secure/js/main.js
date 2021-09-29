@@ -56,6 +56,10 @@ document.getElementById('userinfoButton').addEventListener('click', () => {
   };
   fetchUserInfo(callback);
 });
+document.getElementById('clearUserinfoButton').addEventListener('click', () => {
+  document.getElementById('userinfoText').textContent = '';
+  document.getElementById('userinfoErrorText').textContent = '';
+});
 
 // ---------------------------------------------------
 // Callback function to update page header with username
@@ -137,53 +141,7 @@ document.getElementById('introspectButton').addEventListener('click', () => {
   };
   fetchTokenInfo(callback);
 });
-
-//
-// Show or hide IOT panels
-//
-document.getElementById('iotDescriptionButton1').addEventListener('click', () => {
-  if (document.getElementById('iotDescriptionDiv').hasAttribute('hidden')) {
-    document.getElementById('iotDescriptionDiv').removeAttribute('hidden');
-    document.getElementById('iotDescriptionButton1').textContent = 'Hide IOT Description';
-  } else {
-    document.getElementById('iotDescriptionDiv').setAttribute('hidden', '');
-    document.getElementById('iotDescriptionButton1').textContent = 'Show IOT Description';
-  }
-});
-
-document.getElementById('iotDescriptionButton2').addEventListener('click', () => {
-  document.getElementById('iotDescriptionDiv').setAttribute('hidden', '');
-  document.getElementById('iotDescriptionButton1').textContent = 'Show IOT Description';
-});
-//
-// Show or hide API panels
-document.getElementById('apiDescriptionButton1').addEventListener('click', () => {
-  if (document.getElementById('apiDescriptionDiv').hasAttribute('hidden')) {
-    document.getElementById('apiDescriptionDiv').removeAttribute('hidden');
-    document.getElementById('apiDescriptionButton1').textContent = 'Hide API Description';
-  } else {
-    document.getElementById('apiDescriptionDiv').setAttribute('hidden', '');
-    document.getElementById('apiDescriptionButton1').textContent = 'Show API Description';
-  }
-});
-
-document.getElementById('apiDescriptionButton2').addEventListener('click', () => {
-  document.getElementById('apiDescriptionDiv').setAttribute('hidden', '');
-  document.getElementById('apiDescriptionButton1').textContent = 'Show API Description';
-});
-//
-// Show or Web Server panels
-document.getElementById('webDescriptionButton1').addEventListener('click', () => {
-  if (document.getElementById('webDescriptionDiv').hasAttribute('hidden')) {
-    document.getElementById('webDescriptionDiv').removeAttribute('hidden');
-    document.getElementById('webDescriptionButton1').textContent = 'Hide Web Server Description';
-  } else {
-    document.getElementById('webDescriptionDiv').setAttribute('hidden', '');
-    document.getElementById('webDescriptionButton1').textContent = 'Show Web Server Description';
-  }
-});
-
-document.getElementById('webDescriptionButton2').addEventListener('click', () => {
-  document.getElementById('webDescriptionDiv').setAttribute('hidden', '');
-  document.getElementById('webDescriptionButton1').textContent = 'Show Web Server Description';
+document.getElementById('clearIntrospectButton').addEventListener('click', () => {
+  document.getElementById('introspectText').textContent = '';
+  document.getElementById('introspectErrorText').textContent = '';
 });
