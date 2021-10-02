@@ -12,8 +12,6 @@ const path = require('path');
 
 // express packages
 const express = require('express');
-const bodyParser = require('body-parser');
-// const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const logger = require('morgan');
 const logConfig = require('./utils/log-config');
@@ -49,10 +47,8 @@ if (nodeEnv === 'production') {
   }
 }
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(cookieParser());
-// app.use(cookieParser(config.session.secret));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 if (nodeEnv === 'production') {
   app.use(compression());
@@ -99,7 +95,7 @@ app.use(checkVhost.rejectNotVhost);
 const sessionOptions = {
   name: 'collab-frontend.sid',
   proxy: false,
-  rolling: true,
+  rolling: false,
   secret: config.session.secret,
   cookie: {
     path: '/',
