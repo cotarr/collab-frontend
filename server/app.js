@@ -19,6 +19,7 @@ const helmet = require('helmet');
 
 const compression = require('compression');
 const app = express();
+const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const passport = require('passport');
 const logout = require('./auth/logout');
 
@@ -140,13 +141,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 require('./auth/passport-config');
 
-// app.use((req, res, next) => {
-//   console.log('isAuthenticated() ', req.isAuthenticated());
-//   console.log('req.sessionID ', req.sessionID);
-//   // console.log('req.session ', req.session);
-//   next();
-// });
-
 // Route for robot policy
 app.get('/robots.txt', robotPolicy);
 
@@ -161,14 +155,11 @@ app.get('/login', passport.authenticate('oauth2'));
 // An auth server redirect back with "/login/callback?error=access_denied"
 // will issue standard 401 Unauthorized unless failureRedirect URL is defined.
 //
-// app.get('/login/callback',
-//   passport.authenticate('oauth2', {
-//     successReturnToOrRedirect: '/redirect.html'
-//   })
-// );
 app.get('/login/callback',
   passport.authenticate('oauth2'),
-  (req, res) => { res.redirect('/redirect.html'); }
+  (req, res) => {
+    res.redirect('/redirect.html');
+  }
 );
 
 // -----------------------------------------------------
@@ -176,7 +167,6 @@ app.get('/login/callback',
 // -----------------------------------------------------
 app.get('/logout',
   logout.skipLogoutIfNeeded,
-  passport.authenticate('main', { noredirect: true }),
   logout.fullLogoutWithTokenRevoke
 );
 app.get('/logout.css', logout.logoutServeCss);
@@ -185,6 +175,7 @@ app.get('/logout.css', logout.logoutServeCss);
 // Redirect user to authorization server to change password
 // ---------------------------------------------------------
 app.get('/changepassword',
+  passport.authenticate('main', { noredirect: true }),
   (req, res) => { res.redirect(config.oauth2.authURL + '/changepassword'); }
 );
 
@@ -233,12 +224,15 @@ app.get('/secure',
 // -------------------------------
 const secureDir = path.join(__dirname, '../secure');
 console.log('Serving files from: ' + secureDir);
-app.use(passport.authenticate('main'), express.static(secureDir));
+app.use(
+  ensureLoggedIn(),
+  express.static(secureDir)
+);
 
 // ---------------------------------
 //       T E S T   E R R O R
 // ---------------------------------
-app.get('/error', (req, res, next) => { throw new Error('Test error'); });
+// app.get('/error', (req, res, next) => { throw new Error('Test error'); });
 
 // ---------------------------------
 //    E R R O R   H A N D L E R S
