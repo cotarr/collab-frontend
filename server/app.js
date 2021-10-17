@@ -105,8 +105,8 @@ const sessionOptions = {
     // express-session takes maxAge in milliseconds
     maxAge: config.session.maxAge,
     secure: config.server.tls,
-    httpOnly: true,
-    sameSite: 'Strict'
+    httpOnly: true
+    // sameSite: 'Strict'
   }
 };
 
