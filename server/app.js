@@ -97,6 +97,8 @@ const sessionOptions = {
   name: 'collab-frontend.sid',
   proxy: false,
   rolling: false,
+  resave: false,
+  saveUninitialized: false,
   secret: config.session.secret,
   cookie: {
     path: '/',
@@ -104,28 +106,28 @@ const sessionOptions = {
     maxAge: config.session.maxAge,
     secure: config.server.tls,
     httpOnly: true,
-    // sameSite: 'Lax'
     sameSite: 'Strict'
   }
 };
 
-const sessionStore = {};
 if (config.session.disableMemorystore) {
-  console.log('Using FileStore for session storage');
-  sessionOptions.resave = false;
-  sessionOptions.saveUninitialized = false;
-  sessionStore.FileStore = require('session-file-store')(session);
-  sessionOptions.store = new sessionStore.FileStore({
-    // session-file-store in seconds
-    ttl: config.session.ttl,
-    retries: 0
+  // redis database queries
+  // list:       KEYS *
+  // view:       GET <key>
+  // Clear all:  FLUSHALL
+  console.log('Using redis for session storage');
+  const redis = require('redis');
+  const RedisStore = require('connect-redis')(session);
+  const redisClient = redis.createClient();
+  sessionOptions.store = new RedisStore({
+    client: redisClient,
+    prefix: 'collab-frontend'
+    // ttl: (inherits from cookie)
   });
 } else {
   console.log('Using memorystore for session storage');
-  sessionOptions.resave = false;
-  sessionOptions.saveUninitialized = false;
-  sessionStore.MemoryStore = require('memorystore')(session);
-  sessionOptions.store = new sessionStore.MemoryStore({
+  const MemoryStore = require('memorystore')(session);
+  sessionOptions.store = new MemoryStore({
     // memorystore in milliseconds
     ttl: config.session.maxAge,
     stale: true,
@@ -163,12 +165,9 @@ app.get('/login/callback',
 );
 
 // -----------------------------------------------------
-// User logout route
+// User logout routes
 // -----------------------------------------------------
-app.get('/logout',
-  logout.skipLogoutIfNeeded,
-  logout.fullLogoutWithTokenRevoke
-);
+app.get('/logout', logout.logout);
 app.get('/logout.css', logout.logoutServeCss);
 
 // ---------------------------------------------------------
