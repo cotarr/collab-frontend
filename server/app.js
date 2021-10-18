@@ -110,24 +110,25 @@ const sessionOptions = {
   }
 };
 
-if (config.session.disableMemorystore) {
+const sessionStore = {};
+if (config.session.enableRedis) {
   // redis database queries
   // list:       KEYS *
   // view:       GET <key>
   // Clear all:  FLUSHALL
   console.log('Using redis for session storage');
-  const redis = require('redis');
-  const RedisStore = require('connect-redis')(session);
-  const redisClient = redis.createClient();
-  sessionOptions.store = new RedisStore({
-    client: redisClient,
-    prefix: 'collab-frontend'
+  sessionStore.redis = require('redis');
+  sessionStore.RedisStore = require('connect-redis')(session);
+  sessionStore.redisClient = sessionStore.redis.createClient();
+  sessionOptions.store = new sessionStore.RedisStore({
+    client: sessionStore.redisClient,
+    prefix: config.session.redisPrefix
     // ttl: (inherits from cookie)
   });
 } else {
   console.log('Using memorystore for session storage');
-  const MemoryStore = require('memorystore')(session);
-  sessionOptions.store = new MemoryStore({
+  sessionStore.MemoryStore = require('memorystore')(session);
+  sessionOptions.store = new sessionStore.MemoryStore({
     // memorystore in milliseconds
     ttl: config.session.maxAge,
     stale: true,

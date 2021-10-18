@@ -27,7 +27,8 @@ exports.session = {
   maxAge: parseInt(process.env.SESSION_EXPIRE_SEC || '604800') * 1000,
   ttl: parseInt(process.env.SESSION_EXPIRE_SEC || '608400'),
   secret: process.env.SESSION_SECRET || 'Change Me',
-  disableMemorystore: (process.env.SESSION_DISABLE_MEMORYSTORE === 'true') || false
+  enableRedis: (process.env.SESSION_ENABLE_REDIS === 'true') || false,
+  redisPrefix: process.env.SESSION_REDIS_PREFIX || 'session:'
 };
 
 exports.oauth2 = {
