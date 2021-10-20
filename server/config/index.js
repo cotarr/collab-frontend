@@ -28,7 +28,8 @@ exports.session = {
   ttl: parseInt(process.env.SESSION_EXPIRE_SEC || '608400'),
   secret: process.env.SESSION_SECRET || 'Change Me',
   enableRedis: (process.env.SESSION_ENABLE_REDIS === 'true') || false,
-  redisPrefix: process.env.SESSION_REDIS_PREFIX || 'session:'
+  redisPrefix: process.env.SESSION_REDIS_PREFIX || 'session:',
+  redisPassword: process.env.SESSION_REDIS_PASSWORD || ''
 };
 
 exports.oauth2 = {

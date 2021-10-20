@@ -119,7 +119,12 @@ if (config.session.enableRedis) {
   console.log('Using redis for session storage');
   sessionStore.redis = require('redis');
   sessionStore.RedisStore = require('connect-redis')(session);
-  sessionStore.redisClient = sessionStore.redis.createClient();
+  const redisOptions = {};
+  // must match /etc/redis/redis.conf "requirepass <password>"
+  if ((config.session.redisPassword) && (config.session.redisPassword.length > 0)) {
+    redisOptions.password = config.session.redisPassword;
+  }
+  sessionStore.redisClient = sessionStore.redis.createClient(redisOptions);
   sessionOptions.store = new sessionStore.RedisStore({
     client: sessionStore.redisClient,
     prefix: config.session.redisPrefix
