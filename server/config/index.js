@@ -39,6 +39,7 @@ exports.oauth2 = {
   // The redirect URI must be in client allowedRedirectURI list.
   mainURL: process.env.OAUTH2_MAIN_URL || 'http://localhost:3000',
   authURL: process.env.OAUTH2_AUTH_URL || 'http://127.0.0.1:3500',
+  enableRefreshToken: (process.env.OAUTH_ENABLE_REFRESH_TOKEN === 'true') || false,
   requestedScope: JSON.parse(process.env.OAUTH2_REQUESTED_SCOPE ||
     '["api.read", "api.write"]')
 

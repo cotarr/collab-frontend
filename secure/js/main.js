@@ -17,15 +17,8 @@ const fetchUserInfo = (callback) => {
       if (response.ok) {
         return response.json();
       } else {
-        let errorString = 'Fetch status ' + response.status + ' ' +
-          fetchOptions.method + ' ' + fetchUrl;
-        // On token failure, an OAuth2 API should provide a WWW-Authentication header
-        // If WWW-Authentication header is present, append it.
-        const wwwAuthenticateHeader = response.headers.get('WWW-Authenticate');
-        if (wwwAuthenticateHeader) {
-          errorString += ' WWW-Authenticate header: ' + wwwAuthenticateHeader;
-        }
-        throw new Error(errorString);
+        throw new Error('Fetch status ' + response.status + ' ' +
+          fetchOptions.method + ' ' + fetchUrl);
       }
     })
     .then((json) => {

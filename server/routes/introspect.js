@@ -2,15 +2,18 @@
 
 const fetch = require('node-fetch');
 
+const getAccessToken = require('../auth/add-access-token').getAccessToken;
+
 const config = require('../config');
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
 const fetchIntrospect = (req, callback) => {
-  if ((req.authInfo) && (req.authInfo.access_token)) {
+  const accessToken = getAccessToken(req);
+  if (accessToken) {
     const clientAuth = Buffer.from(config.oauth2.clientId + ':' +
       config.oauth2.clientSecret).toString('base64');
     const body = {
-      access_token: req.authInfo.access_token
+      access_token: accessToken
     };
     const fetchUrl = config.oauth2.authURL + '/oauth/introspect';
     const fetchOptions = {
@@ -28,8 +31,17 @@ const fetchIntrospect = (req, callback) => {
         if (response.ok) {
           return response.json();
         } else {
-          throw new Error('Fetch status ' + response.status + ' ' +
-          fetchOptions.method + ' ' + fetchUrl);
+          let errorString = 'Fetch status ' + response.status + ' ' +
+            fetchOptions.method + ' ' + fetchUrl;
+          // If WWW-Authentication header is present, append it.
+          const wwwAuthenticateHeader = response.headers.get('WWW-Authenticate');
+          if (wwwAuthenticateHeader) {
+            console.log('WWW-Authenticate header:', wwwAuthenticateHeader);
+            errorString += ' WWW-Authenticate header: ' + wwwAuthenticateHeader;
+          }
+          const err = new Error(errorString);
+          err.status = response.status;
+          throw err;
         }
       })
       .then((introspect) => {
@@ -49,8 +61,16 @@ const fetchIntrospect = (req, callback) => {
 const user = (req, res, next) => {
   fetchIntrospect(req, (err, data) => {
     if (err) {
-      // console.log(err.message);
-      res.json({});
+      if ((err.status) && (parseInt(err.status) === 401)) {
+        // Special case, this is passing through status of the auth server
+        return res.status(401).send('Unauthorized');
+      } else if ((err.status) && (parseInt(err.status) === 403)) {
+        // Special case, this is passing through status of the auth server
+        return res.status(403).send('Forbidden');
+      } else {
+        // else, bad gateway as if proxy server
+        return res.status(502).send('Bad Gateway');
+      }
     } else {
       const user = {
         id: data.user.id,

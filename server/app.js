@@ -19,7 +19,6 @@ const helmet = require('helmet');
 
 const compression = require('compression');
 const app = express();
-const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const passport = require('passport');
 const logout = require('./auth/logout');
 
@@ -96,7 +95,7 @@ app.use(checkVhost.rejectNotVhost);
 const sessionOptions = {
   name: 'collab-frontend.sid',
   proxy: false,
-  rolling: false,
+  rolling: true,
   resave: false,
   saveUninitialized: false,
   secret: config.session.secret,
@@ -147,7 +146,23 @@ app.use(session(sessionOptions));
 // -----------------------
 app.use(passport.initialize());
 app.use(passport.session());
-require('./auth/passport-config');
+
+//
+// Config options, standard oauth2, or oauth2 with refresh token middleware
+//
+let ensureAuthenticated;
+let denyUnauthorized;
+if (config.oauth2.enableRefreshToken) {
+  console.log('Refresh token: enabled');
+  require('./auth/passport-config-with-refresh');
+  ensureAuthenticated = require('./auth/auth-check-with-refresh').ensureAuthenticated;
+  denyUnauthorized = require('./auth/auth-check-with-refresh').denyUnauthorized;
+} else {
+  console.log('Refresh token: disabled');
+  require('./auth/passport-config-no-refresh');
+  ensureAuthenticated = require('./auth/auth-check-no-refresh').ensureAuthenticated;
+  denyUnauthorized = require('./auth/auth-check-no-refresh').denyUnauthorized;
+}
 
 // Route for robot policy
 app.get('/robots.txt', robotPolicy);
@@ -166,7 +181,8 @@ app.get('/login', passport.authenticate('oauth2'));
 app.get('/login/callback',
   passport.authenticate('oauth2'),
   (req, res) => {
-    res.redirect('/redirect.html');
+    // res.redirect('/redirect.html');
+    res.redirect('/');
   }
 );
 
@@ -180,7 +196,7 @@ app.get('/logout.css', logout.logoutServeCss);
 // Redirect user to authorization server to change password
 // ---------------------------------------------------------
 app.get('/changepassword',
-  passport.authenticate('main', { noredirect: true }),
+  denyUnauthorized,
   (req, res) => { res.redirect(config.oauth2.authURL + '/changepassword'); }
 );
 
@@ -197,7 +213,7 @@ app.use(redirectPage);
 //     API routes
 // --------------------
 app.get('/userinfo',
-  passport.authenticate('main', { noredirect: true }),
+  denyUnauthorized,
   userinfo
 );
 
@@ -206,13 +222,13 @@ app.get('/userinfo',
 // This info is not intended for use by end user.
 // ----------------------------------------------------------------------
 app.get('/proxy/oauth/introspect',
-  passport.authenticate('main', { noredirect: true }),
+  denyUnauthorized,
   introspect
 );
 
 // Mock REST API
 app.use('/api',
-  passport.authenticate('main', { noredirect: true }),
+  denyUnauthorized,
   apiProxy
 );
 
@@ -220,7 +236,7 @@ app.use('/api',
 // Authenticated status
 // -----------------------
 app.get('/secure',
-  passport.authenticate('main', { noredirect: true }),
+  denyUnauthorized,
   (req, res) => res.json({ secure: 'ok' })
 );
 
@@ -230,7 +246,7 @@ app.get('/secure',
 const secureDir = path.join(__dirname, '../secure');
 console.log('Serving files from: ' + secureDir);
 app.use(
-  ensureLoggedIn(),
+  ensureAuthenticated,
   express.static(secureDir)
 );
 
