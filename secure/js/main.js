@@ -1,5 +1,18 @@
 'use strict';
-
+//
+// Demo web site - JavaScript controller
+//
+// The purpose of this web site is to demonstrate
+//  1) Automatic redirect to authorization server for user login
+//        This is accomplished by traping errors retrieving user information.
+//        Alternately, the user's name is displayed in the banner.
+//  2) Login, logout, and change password user functions
+//        The HTML contains links and buttons to interact with authorization server.
+//  3) User initiated API request and display of retrieved data on web page.
+//        API fetch request is in separate file api-data.js.
+//  4) For demonstration purposes, the access token can be decoded and displayed.
+//        In a normal web site, the token is not available to the user.
+//
 // -------------------
 // Internal function
 // -------------------

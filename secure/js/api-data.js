@@ -1,6 +1,18 @@
-// -------------------
-// Internal function
-// -------------------
+'use strict';
+//
+// Emulation of REST API data retrieval
+//
+// This file contains a function to retrieve mock data
+// from an emulated database.
+//
+// The purpose is to demonstrate use of an oauth access token
+// to authorize the API call to the backend.
+//
+// ---------------------------------------------------
+
+// --------------------------
+//  Internal fetch function
+// --------------------------
 const getTestApiData = (endpointUrl) => {
   const fetchUrl = endpointUrl;
   const fetchOptions = {
@@ -16,7 +28,7 @@ const getTestApiData = (endpointUrl) => {
       } else {
         let errorString = 'Fetch status ' + response.status + ' ' +
           fetchOptions.method + ' ' + fetchUrl;
-        // On token failure, an OAuth2 API should provide a WWW-Authentication header
+        // This is for demonstration and debugging purposes.
         // If WWW-Authentication header is present, append it.
         const wwwAuthenticateHeader = response.headers.get('WWW-Authenticate');
         if (wwwAuthenticateHeader) {

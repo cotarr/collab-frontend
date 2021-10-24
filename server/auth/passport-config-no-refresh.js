@@ -50,7 +50,6 @@ const oauth2Strategy = new OAuth2Strategy(
     clientID: config.oauth2.clientId,
     clientSecret: config.oauth2.clientSecret,
     callbackURL: config.oauth2.mainURL + '/login/callback',
-    // passReqToCallback must be false (refresh strategy)
     passReqToCallback: false,
     scope: config.oauth2.requestedScope
   },

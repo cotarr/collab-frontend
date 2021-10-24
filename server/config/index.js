@@ -1,13 +1,14 @@
 'use strict';
 
-const path = require('path');
+// const path = require('path');
 
+// Import UNIX environment variables from .env file and add to process.env
 require('dotenv').config();
 
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
 exports.site = {
-  // Vhost example: "auth.example.com"
+  // Vhost example: "auth.example.com". Use '*' to accept any URL or numeric IP
   vhost: process.env.SITE_VHOST || '*',
   // Example: "mailto:security@example.com",
   securityContact: process.env.SITE_SECURITY_CONTACT || '',

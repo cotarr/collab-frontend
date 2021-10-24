@@ -31,7 +31,6 @@ const securityContact = require('./utils/security-contact');
 const apiProxy = require('./routes/api-proxy');
 const userinfo = require('./routes/introspect').user;
 const introspect = require('./routes/introspect').introspect;
-const redirectPage = require('./routes/redirect.js');
 
 const config = require('./config');
 const nodeEnv = process.env.NODE_ENV || 'development';
@@ -181,7 +180,6 @@ app.get('/login', passport.authenticate('oauth2'));
 app.get('/login/callback',
   passport.authenticate('oauth2'),
   (req, res) => {
-    // res.redirect('/redirect.html');
     res.redirect('/');
   }
 );
@@ -200,15 +198,6 @@ app.get('/changepassword',
   (req, res) => { res.redirect(config.oauth2.authURL + '/changepassword'); }
 );
 
-// ----------------------------------------------------------
-// Page "/redirect.html" has timer event redirecting to "/"
-// This is a workaround to address issue where main page "/"
-// session not being authenitcated on first redirect,
-// which causes a redirect back to oauth provider site.
-// This page does not require authentication.
-// ----------------------------------------------------------
-app.use(redirectPage);
-
 // --------------------
 //     API routes
 // --------------------
@@ -226,7 +215,9 @@ app.get('/proxy/oauth/introspect',
   introspect
 );
 
+// ----------------
 // Mock REST API
+// ----------------
 app.use('/api',
   denyUnauthorized,
   apiProxy

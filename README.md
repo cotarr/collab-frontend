@@ -12,7 +12,7 @@ The web server includes a reverse proxy to redirect requests to the mock REST AP
 
 |                        Repository                                  |                   Description                         |
 | ------------------------------------------------------------------ | ----------------------------------------------------- |
-| collab-auth                                                        | Oauth2 Authorization Provider, redirect login, tokens |
+| [collab-auth](https://github.com/cotarr/collab-auth)               | Oauth2 Authorization Provider, redirect login, tokens |
 | [collab-frontend](https://github.com/cotarr/collab-frontend)       | Mock Web server, reverse proxy, HTML content          |
 | [collab-backend-api](https://github.com/cotarr/collab-backend-api) | Mock REST API using tokens to authorize requests      |
 | [collab-iot-device](https://github.com/cotarr/collab-iot-device)   | Mock IOT Device with data acquisition saved to DB     |
@@ -43,8 +43,7 @@ npm start
 
 * All 4 repositories must be started to use this demo.
 
-
-All files on this website are protected.
+All files on this website are access restricted and require login.
 No website files will load until the user successfully provides a username and password.
 Any unauthorized attempt to view the page will redirect the browser to the
 oauth2 authorization server. After successful entry of username and password,
@@ -81,22 +80,6 @@ timestamped data points from the mock IOT device should be available in the arra
     "createdAt": "2021-09-17T15:33:07.797Z"
   }
 ]
-```
-
-There is a button that can be used to view user account information for the
-currently logged in user. This is intended for internal use by the browser JavaScript to
-display the user's name in the header bar or other location.
-
-```
-{
-  "id": "a7b06a6d-7538-45c8-bb5f-b107a8258c7d",
-  "number": 1,
-  "username": "bob",
-  "name": "Bob Smith",
-  "scope": [
-    "api.read"
-  ]
-}
 ```
 
 For demonstration purposes, there is a test API on the web server that will display the
@@ -139,6 +122,22 @@ http request and the property `active === true` in the body of the response.
 }
 ```
 
+There is a button that can be used to view user account information for the
+currently logged in user. This is intended for internal use by the browser JavaScript to
+display the user's name in the header bar or other location.
+
+```
+{
+  "id": "a7b06a6d-7538-45c8-bb5f-b107a8258c7d",
+  "number": 1,
+  "username": "bob",
+  "name": "Bob Smith",
+  "scope": [
+    "api.read"
+  ]
+}
+```
+
 ### Example Environment variables (showing defaults)
 
 The `.env` file is supported using dotenv npm package
@@ -169,3 +168,33 @@ OAUTH2_REQUESTED_SCOPE='["api.read","api.write"]'
 
 REMOTE_API_URL=http://localhost:4000
 ```
+
+### Use of oauth2 refresh tokens
+
+Warning: The refresh token middleware repository that was used here does not 
+appear to be actively maintained, and there were some issues with refresh token 
+middleware causing the a crash in node. A work-around patch was added to
+a local clone and linked in the package.json, but it is 
+unknown if this fully solved the problem.
+Therefore, the use of this option should be limited to demonstration of 
+the concept of refresh tokens, but not to considered a robust example.
+
+The default configuration uses the npm passport and passport-oauth2 
+to perform the oauth 2.0 handshakes. No issues with these repositories
+was observer. However this configuration is limited to single issue
+oauth access tokens, and use of refresh tokens to obtain repacement 
+access tokens are not supported.
+
+Oauth 2.0 supports use of a refresh token. Refresh tokens are supported
+by the collab-auth server.
+As a configuration option, the npm package passport-oauth2-middleware can 
+be used to demonstrate the use of refresh tokens. 
+When the middleware is inserted into the request, the middleware checks
+the expiration date of the access token before authorizing the request.
+If the access token is expired, then the refresh token can be exchanged 
+for a new access code. In other words, the refresh token is
+used as a temporary password on behalf of the user.
+
+For demonstration purposes, refresh tokens may be enabled in the configuration.
+In the node/express web server, several different source code files are loaded alternately
+depending on the refresh token setting.
