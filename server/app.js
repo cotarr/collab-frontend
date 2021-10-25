@@ -26,6 +26,8 @@ const logout = require('./auth/logout');
 const checkVhost = require('./middlewares/check-vhost');
 const robotPolicy = require('./utils/robot-policy');
 const securityContact = require('./utils/security-contact');
+const ensureAuthenticated = require('./auth/auth-check').ensureAuthenticated;
+const denyUnauthorized = require('./auth/auth-check').denyUnauthorized;
 
 // Route Handlers
 const apiProxy = require('./routes/api-proxy');
@@ -145,23 +147,7 @@ app.use(session(sessionOptions));
 // -----------------------
 app.use(passport.initialize());
 app.use(passport.session());
-
-//
-// Config options, standard oauth2, or oauth2 with refresh token middleware
-//
-let ensureAuthenticated;
-let denyUnauthorized;
-if (config.oauth2.enableRefreshToken) {
-  console.log('Refresh token: enabled');
-  require('./auth/passport-config-with-refresh');
-  ensureAuthenticated = require('./auth/auth-check-with-refresh').ensureAuthenticated;
-  denyUnauthorized = require('./auth/auth-check-with-refresh').denyUnauthorized;
-} else {
-  console.log('Refresh token: disabled');
-  require('./auth/passport-config');
-  ensureAuthenticated = require('./auth/auth-check').ensureAuthenticated;
-  denyUnauthorized = require('./auth/auth-check').denyUnauthorized;
-}
+require('./auth/passport-config');
 
 // Route for robot policy
 app.get('/robots.txt', robotPolicy);

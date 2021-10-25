@@ -194,7 +194,6 @@ OAUTH2_CLIENT_ID=abc123
 OAUTH2_CLIENT_SECRET=ssh-secret
 OAUTH2_MAIN_URL=http://localhost:3000
 OAUTH2_AUTH_URL=http://127.0.0.1:3500
-OAUTH_ENABLE_REFRESH_TOKEN=false
 OAUTH2_REQUESTED_SCOPE='["api.read","api.write"]'
 
 REMOTE_API_URL=http://localhost:4000
@@ -276,46 +275,3 @@ expired, a password form will be presented to the user as part of the workflow.
 In summary, by properly managing the expiration time of the cookies and tokens
 persistent login can be maintained. New tokens are replaced automatically
 during page load or page refresh as needed.
-
-### Use of oauth2 refresh tokens
-
-Warning: The refresh token middleware repository that was used here does not
-appear to be actively maintained, and there were some issues with refresh token
-middleware causing the a crash in node. A work-around patch was added to
-a local clone and linked in the package.json, but it is
-unknown if this fully solved the problem.
-Therefore, the use of the refresh token option should be limited to demonstration of
-the concept.
-
-The default configuration uses the npm passport and passport-oauth2
-to perform the oauth 2.0 handshakes. No issues with these repositories
-were observed. However this configuration is limited to single issue
-oauth access tokens, and use of refresh tokens to obtain replacement
-access tokens are not supported.
-
-Oauth 2.0 supports use of a refresh token.
-As a configuration option, the npm package passport-oauth2-middleware can
-be used to demonstrate the use of refresh tokens to automatically obtain replacement access tokens.
-When the middleware is inserted into the request, the middleware checks
-the expiration date of the access token before authorizing the request.
-If the access token is expired, then the refresh token can be exchanged
-for an access code to obtain a replacement access token. In other words, the refresh token is
-used as a temporary password on behalf of the user.
-
-For demonstration purposes, refresh tokens may be enabled for grant type
-code grant in the configuration using environment variable `OAUTH_ENABLE_REFRESH_TOKEN=true`.
-The passport-oauth2-middleware is only required for the refresh token option and may be
-removed from package.json when refresh tokens are not enabled.
-In the node/express web server, several different source code files are loaded alternately
-depending on the refresh token setting. These alternate modules are selected in app.js in 
-accordance with the configuration settings. The following modules are impacted.
-
-```
-auth/auth-check-no-refresh.js
-auth/passport-config-no-refresh.js
-
-or
-
-auth/auth-check-with-refresh.js
-auth/passport-config-with-refresh.js
-```
