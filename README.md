@@ -43,15 +43,25 @@ npm start
 
 * All 4 repositories must be started to use this demo.
 
-All files on this website are access restricted and require login.
+* Web server URL: [http://localhost:3000](http://localhost:3000)
+
+Static Content:
+
+This is intended to emulate a private web site. All files on this website are access restricted.
 No website files will load until the user successfully provides a username and password.
 Any unauthorized attempt to view the page will redirect the browser to the
 oauth2 authorization server. After successful entry of username and password,
-the browser will be automatically redirected back to the original web site.
+the browser will be automatically redirected back to the original web site with an authorization code.
+This web server will submit the authorization code to the authorization server and
+a valid oauth access token will be returned to the web server where the token is
+stored on behalf of the user. The user's session is marked as authorized.
+All further requests to download static content will confirm the user's authorized status
+before returning the content of static files.
 
-[http://localhost:3000](http://localhost:3000)
+API Access:
 
-It is assumed the mock IOT device has been started and has been submitting mock data to the database,
+It is assumed the mock REST API and the mock IOT device haave been started
+and mock data is being submitted to the database,
 The web browser will use it's stored cookie to access the proper route on the web server.
 The web server will append a copy of the user oauth2 access token to the HTTP request.
 The web server will forward the request through a reverse proxy to the mock database API.
@@ -138,6 +148,27 @@ display the user's name in the header bar or other location.
 }
 ```
 
+### Scope values
+
+There are three scope value that are relevant to this example:
+
+* The user account scope
+* The web server client account scope
+* The web server token request scope.
+
+The user and client scope are set in the authorization server.
+The only scope relevant to this web server module is the token request scope.
+The default value is `'["api.read", "api.write"]')`.
+This can be customized using the OAUTH2_REQUESTED_SCOPE environment variable
+
+* The web server's client account scope requires "auth.token" to permit the authorization server to issue tokens to the web server.
+* The web server's client account scope requires "api.read" so tokens issued using client will be accepted by the mock API.
+* The user's account scope requires "api.read" so tokens issued on behalf of user will be accepted by the mock API.
+* The token request scope requires "api.read" so tokens issued to the web server will be accepted by the mock API.
+
+The scope of the access token is the intersection of all three scopes. The desired scope my be present in all three. In this case, tokens issued on behalf of the user will have scope intersection of "api.read". Any requests to the backend API must have a valid token and the token must include scope "api.read" or the request will be rejected.
+Invalid tokens will reject with status 401 Authorized. Insufficient scope will reject with status 403 Forbidden.
+
 ### Example Environment variables (showing defaults)
 
 The `.env` file is supported using dotenv npm package
@@ -169,32 +200,121 @@ OAUTH2_REQUESTED_SCOPE='["api.read","api.write"]'
 REMOTE_API_URL=http://localhost:4000
 ```
 
+### Replacing expired user cookie
+
+In this demonstration, expired cookies can be updated by refreshing the page.
+
+Access to the static files such as HTML, CSS and JS are authorized by
+the user's cookie that is stored on the web server.
+Validation of the cookie is performed by the web server by
+comparing the cookie ID to a value stored in the users session.
+
+When the web server detects an expired cookie, a redirect (302) to /login
+is returned to the web browser. This initiates the oauth workflow
+by sending the browser to /dialog/authorize path on the authorization server.
+
+The user's browser can store two cookies, one for the web page, and a
+second cookie for the authorization server login page.
+In the case where the web page cookie is expired or deleted
+the authorization server redirect can be handled in two different ways.
+If the user's second cookie for the authorization server is still valid,
+the request to the /dialog/authorize path will immediately return
+a new authorization code without prompting for a password.
+In the case where both cookies are expired, password entry is required.
+
+After the web server has completed the oauth handshake process,
+the user's session is marked as authorized and future downloads
+will succeed without error. Thus, refreshing the page will renew
+an expired cookie.
+
+In this example, the login redirect will always redirect the browser
+to the main home page. It is possible for the web server to remember
+the initial request path, such as /page3.html or /index.html.
+The path of the original request can be stored in the user's session
+to restore the original request URL after password entry.
+Passport supports this using the successReturnToOrRedirect option.
+This has not been implemented in this demonstration.
+
+### Replacing expired access tokens
+
+In the case of the default configuration, expired access tokens may
+be replaced by refreshing the page. This works as follows:
+
+Expired tokens can be detected on the main web page.
+Third party database requests pass through the web server using a reverse proxy.
+The web server appends the access token to all reverse proxy server requests.
+The web server appends the token without validation of token status.
+Validation is performed by the mock REST API also known as resource server.
+In the case where the access token is expired, the API reverse proxy
+request will return an error to the browser.
+When viewing the main web page, activating the API display button will
+show an error on the web page due to the expired token.
+
+In the previous section, an expired cookie was detected by the web server.
+In the case of API calls, the expired token is detected locally in the user web browser
+by monitoring the response to the /userinfo request.
+
+The web page contains a header bar at the top. The page contains javascript code that
+performs a GET request to the /userinfo route on the web server.
+The web server will in turn submit the user's access token to the authorization
+server /oauth/introspect route. The user's metadata is returned to the web server.
+The user real name is extracted and returned to the web browser.
+The page header is then updated with the user's real name.
+In the event where the /userinfo GET request fails with an error,
+the browser will execute javascript code to set window.location to /login.
+This will initiate an oauth workflow as described above and a replacement
+access token is obtained.
+
+In the case where the user's web browser has a valid cookie for the
+authorization server login page, the password form is not required.
+The oauth redirects are immediate.
+To the user, refreshing the page restores access to the API.
+
+In the case where where the users cookie for the authorization server is 
+expired, a password form will be presented to the user as part of the workflow.
+
+In summary, by properly managing the expiration time of the cookies and tokens
+persistent login can be maintained. New tokens are replaced automatically
+during page load or page refresh as needed.
+
 ### Use of oauth2 refresh tokens
 
-Warning: The refresh token middleware repository that was used here does not 
-appear to be actively maintained, and there were some issues with refresh token 
+Warning: The refresh token middleware repository that was used here does not
+appear to be actively maintained, and there were some issues with refresh token
 middleware causing the a crash in node. A work-around patch was added to
-a local clone and linked in the package.json, but it is 
+a local clone and linked in the package.json, but it is
 unknown if this fully solved the problem.
-Therefore, the use of this option should be limited to demonstration of 
-the concept of refresh tokens, but not to considered a robust example.
+Therefore, the use of the refresh token option should be limited to demonstration of
+the concept.
 
-The default configuration uses the npm passport and passport-oauth2 
+The default configuration uses the npm passport and passport-oauth2
 to perform the oauth 2.0 handshakes. No issues with these repositories
-was observer. However this configuration is limited to single issue
-oauth access tokens, and use of refresh tokens to obtain repacement 
+were observer. However this configuration is limited to single issue
+oauth access tokens, and use of refresh tokens to obtain replacement
 access tokens are not supported.
 
-Oauth 2.0 supports use of a refresh token. Refresh tokens are supported
-by the collab-auth server.
-As a configuration option, the npm package passport-oauth2-middleware can 
-be used to demonstrate the use of refresh tokens. 
+Oauth 2.0 supports use of a refresh token.
+As a configuration option, the npm package passport-oauth2-middleware can
+be used to demonstrate the use of refresh tokens to automatically obtain replacement access tokens.
 When the middleware is inserted into the request, the middleware checks
 the expiration date of the access token before authorizing the request.
-If the access token is expired, then the refresh token can be exchanged 
-for a new access code. In other words, the refresh token is
+If the access token is expired, then the refresh token can be exchanged
+for an access code to obtain a replacement access token. In other words, the refresh token is
 used as a temporary password on behalf of the user.
 
-For demonstration purposes, refresh tokens may be enabled in the configuration.
+For demonstration purposes, refresh tokens may be enabled for grant type
+code grant in the configuration.
 In the node/express web server, several different source code files are loaded alternately
 depending on the refresh token setting.
+In package.json, the passport-oauth2-middleware is only required
+for the refresh token option.
+
+```
+auth/auth-check-no-refresh.js
+auth/passport-config-no-refresh.js
+
+or
+
+auth/auth-check-with-refresh.js
+auth/passport-config-with-refresh.js
+```
