@@ -289,7 +289,7 @@ the concept.
 
 The default configuration uses the npm passport and passport-oauth2
 to perform the oauth 2.0 handshakes. No issues with these repositories
-were observer. However this configuration is limited to single issue
+were observed. However this configuration is limited to single issue
 oauth access tokens, and use of refresh tokens to obtain replacement
 access tokens are not supported.
 
@@ -303,11 +303,12 @@ for an access code to obtain a replacement access token. In other words, the ref
 used as a temporary password on behalf of the user.
 
 For demonstration purposes, refresh tokens may be enabled for grant type
-code grant in the configuration.
+code grant in the configuration using environment variable `OAUTH_ENABLE_REFRESH_TOKEN=true`.
+The passport-oauth2-middleware is only required for the refresh token option and may be
+removed from package.json when refresh tokens are not enabled.
 In the node/express web server, several different source code files are loaded alternately
-depending on the refresh token setting.
-In package.json, the passport-oauth2-middleware is only required
-for the refresh token option.
+depending on the refresh token setting. These alternate modules are selected in app.js in 
+accordance with the configuration settings. The following modules are impacted.
 
 ```
 auth/auth-check-no-refresh.js
