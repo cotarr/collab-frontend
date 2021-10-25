@@ -22,7 +22,9 @@
 							"jar.clear('localhost', (err) => {",
 							"    if (err) console.log(err);",
 							"});",
-							"",
+							"jar.clear('127.0.0.1', (err) => {",
+							"    if (err) console.log(err);",
+							"});",
 							""
 						],
 						"type": "text/javascript"
@@ -466,7 +468,7 @@
 							"pm.test(\"Redirect address is /login\", function () {",
 							"    let location = pm.response.headers.get('Location');",
 							"    location = location.split('?')[0];",
-							"    pm.expect(location).to.equal('/redirect.html');",
+							"    pm.expect(location).to.equal('/');",
 							"});",
 							""
 						],
