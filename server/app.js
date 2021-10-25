@@ -158,9 +158,9 @@ if (config.oauth2.enableRefreshToken) {
   denyUnauthorized = require('./auth/auth-check-with-refresh').denyUnauthorized;
 } else {
   console.log('Refresh token: disabled');
-  require('./auth/passport-config-no-refresh');
-  ensureAuthenticated = require('./auth/auth-check-no-refresh').ensureAuthenticated;
-  denyUnauthorized = require('./auth/auth-check-no-refresh').denyUnauthorized;
+  require('./auth/passport-config');
+  ensureAuthenticated = require('./auth/auth-check').ensureAuthenticated;
+  denyUnauthorized = require('./auth/auth-check').denyUnauthorized;
 }
 
 // Route for robot policy
