@@ -1,14 +1,13 @@
 # colab-frontend
 
-This is 2 of 4 repositories used on a collaboration project for learning oauth2orize and passport.
-This repository is a mock web server using passport strategy passport-oauth2
-and middleware passport-oauth2-middleware.
+This is 2 of 4 repositories.
+This repository is a mock web server using the npm passport package and passport-oauth2
+passport strategy to implement oauth2 to restrict access to the web page.
 The web server emulates a personal web page that would require user authentication to view the page
 and gain access to data in home network IOT devices.
 Unauthorized users are redirected to the oauth2 server for user login.
 After login, the web server stores the user's oauth2 access_token used to obtain access to a mock SQL database.
 The web server includes a reverse proxy to redirect requests to the mock REST API.
-
 
 |                        Repository                                  |                   Description                         |
 | ------------------------------------------------------------------ | ----------------------------------------------------- |
@@ -152,19 +151,19 @@ display the user's name in the header bar or other location.
 
 There are three scope value that are relevant to this example:
 
-* The user account scope
-* The web server client account scope
-* The web server token request scope.
+* The user account scope referred to as "role"
+* The web server client account scope referred to as "allowedScope"
+* The web server token request scope used as a "scope" query parameter.
 
-The user and client scope are set in the authorization server.
+The user role and client allowedScope are set in the authorization server.
 The only scope relevant to this web server module is the token request scope.
 The default value is `'["api.read", "api.write"]')`.
 This can be customized using the OAUTH2_REQUESTED_SCOPE environment variable
 
-* The web server's client account scope requires "auth.token" to permit the authorization server to issue tokens to the web server.
-* The web server's client account scope requires "api.read" so tokens issued using client will be accepted by the mock API.
-* The user's account scope requires "api.read" so tokens issued on behalf of user will be accepted by the mock API.
-* The token request scope requires "api.read" so tokens issued to the web server will be accepted by the mock API.
+* The web server's client account allowedScope "auth.token" is an auth server permission to generally allow token issuance.
+* The web server's client account allowedScope "api.read" to control permissions of tokens issued using the client's ID.
+* The user's account role requires "api.read" to control permissions of tokens using the user's ID.
+* The token request scope requires "api.read" to control permissions of tokens issued to the server.
 
 The scope of the access token is the intersection of all three scopes. The desired scope my be present in all three. In this case, tokens issued on behalf of the user will have scope intersection of "api.read". Any requests to the backend API must have a valid token and the token must include scope "api.read" or the request will be rejected.
 Invalid tokens will reject with status 401 Authorized. Insufficient scope will reject with status 403 Forbidden.
@@ -269,7 +268,7 @@ authorization server login page, the password form is not required.
 The oauth redirects are immediate.
 To the user, refreshing the page restores access to the API.
 
-In the case where where the users cookie for the authorization server is 
+In the case where where the users cookie for the authorization server is
 expired, a password form will be presented to the user as part of the workflow.
 
 In summary, by properly managing the expiration time of the cookies and tokens
