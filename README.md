@@ -17,6 +17,10 @@ The web server includes a reverse proxy to redirect requests to the mock REST AP
 | [collab-iot-device](https://github.com/cotarr/collab-iot-device)   | Mock IOT Device with data acquisition saved to DB     |
 
 
+### Documentation:
+
+https://cotarr.github.io/collab-auth
+
 ### Install
 
 ```bash
@@ -61,13 +65,15 @@ API Access:
 
 It is assumed the mock REST API and the mock IOT device haave been started
 and mock data is being submitted to the database,
-The web browser will use it's stored cookie to access the proper route on the web server.
-The web server will append a copy of the user oauth2 access token to the HTTP request.
-The web server will forward the request through a reverse proxy to the mock database API.
-The web server uses "/api" as the route prefix for the reverse proxy.
-The URL "http://localhost:3000/api/v1/data/iot-data/" can also be viewed directly at port 3000 using the browser's address bar.
-The web server will remove the "/api" prefix before forwarding the HTTP request through the reverse proxy.
-The database API at "http://localhost:4000/v1/data/iot-data/" checks the access_token and honors the request.
+
+* The web browser will use it's stored cookie to access the proper route on the web server.
+* The web server will append a copy of the user oauth2 access token to the HTTP request.
+* The web server will forward the request through a reverse proxy to the mock database API.
+* The web server uses "/api" as the route prefix for the reverse proxy.
+* The URL "http://localhost:3000/api/v1/data/iot-data/" can also be viewed directly at port 3000 using the browser's address bar.
+* The web server will remove the "/api" prefix before forwarding the HTTP request through the reverse proxy.
+* The database API at "http://localhost:4000/v1/data/iot-data/" checks the access_token and honors the request.
+
 It is not possible to directly access the API on port 4000 using the browser address bar
 because the browser does not have an access_token.
 
@@ -160,15 +166,15 @@ The only scope relevant to this web server module is the token request scope.
 The default value is `'["api.read", "api.write"]')`.
 This can be customized using the OAUTH2_REQUESTED_SCOPE environment variable
 
-* The web server's client account allowedScope "auth.token" is an auth server permission to generally allow token issuance.
-* The web server's client account allowedScope "api.read" to control permissions of tokens issued using the client's ID.
+* The web server's client account allowedScope "auth.token" is an auth server permission to allow token issuance on behalf of authenticated users.
+* The web server's client account allowedScope "api.read" and "api-write" are possible permissions of tokens issued using the client's ID.
 * The user's account role requires "api.read" to control permissions of tokens using the user's ID.
-* The token request scope requires "api.read" to control permissions of tokens issued to the server.
+* The token request scope "api.read" and "api.write" relate to capabilities of the server software reverse proxy.
 
 The scope of the access token is the intersection of all three scopes. The desired scope my be present in all three. In this case, tokens issued on behalf of the user will have scope intersection of "api.read". Any requests to the backend API must have a valid token and the token must include scope "api.read" or the request will be rejected.
 Invalid tokens will reject with status 401 Authorized. Insufficient scope will reject with status 403 Forbidden.
 
-### Example Environment variables (showing defaults)
+### Example Environment variables
 
 The `.env` file is supported using dotenv npm package
 
@@ -183,11 +189,11 @@ SERVER_TLS=false
 SERVER_PORT=3000
 SERVER_PID_FILENAME=
 
+SESSION_EXPIRE_SEC=604800
+SESSION_SECRET="Change Me"
 SESSION_ENABLE_REDIS=false
 SESSION_REDIS_PREFIX="session:"
 SESSION_REDIS_PASSWORD=""
-SESSION_EXPIRE_SEC=604800
-SESSION_SECRET="Change Me"
 
 OAUTH2_CLIENT_ID=abc123
 OAUTH2_CLIENT_SECRET=ssh-secret
