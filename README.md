@@ -1,8 +1,8 @@
 # colab-frontend
 
 This is 2 of 4 repositories.
-This repository is a mock web server using the npm passport package and passport-oauth2
-passport strategy to implement oauth2 to restrict access to the web page.
+This repository is a mock web server using the npm [passport](https://www.npmjs.com/package/passport)
+package with passport-oauth2 passport strategy to implement oauth2 to restrict access to the web page.
 The web server emulates a personal web page that would require user authentication to view the page
 and gain access to data in home network IOT devices.
 Unauthorized users are redirected to the oauth2 server for user login.
