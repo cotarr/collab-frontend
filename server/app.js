@@ -152,6 +152,11 @@ require('./auth/passport-config');
 // Route for robot policy
 app.get('/robots.txt', robotPolicy);
 
+// Edge case, IOS iPhone brwoser request
+// favicon.ico without cookie, causing
+// new authorization workflow to start
+app.get('/favicon.ico', (req, res) => { res.end(); });
+
 // -------------------------
 // Authorizaton Routes
 // -------------------------
