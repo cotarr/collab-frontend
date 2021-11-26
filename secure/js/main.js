@@ -73,15 +73,12 @@ document.getElementById('clearUserinfoButton').addEventListener('click', () => {
 const loadCallback = (err, data) => {
   if (err) {
     document.getElementById('headerName').textContent = '';
-    document.getElementById('headerLoginButton').removeAttribute('hidden');
-    window.location = '/login';
+    window.location = '/unauthorized.html';
   } else if ((data) && ('name' in data)) {
     document.getElementById('headerName').textContent = data.name;
-    document.getElementById('headerLoginButton').setAttribute('hidden', '');
   } else {
     document.getElementById('headerName').textContent = '';
-    document.getElementById('headerLoginButton').removeAttribute('hidden');
-    window.location = '/login';
+    window.location = '/unauthorized.html';
   }
 }; // loadCallback()
 

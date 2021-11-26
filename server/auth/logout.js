@@ -24,12 +24,14 @@ const config = require('../config');
  */
 const logoutHtml =
   logout1Html +
-  'You have been successfully logged out of the web server at ' +
-   config.oauth2.mainURL + '. ' +
+  'Logout successful for the web server at ' +
+   config.oauth2.mainURL + '.' +
+  '<br><br>' +
   'You may still be logged in to the authorization server at ' + config.oauth2.authURL + '. ' +
-  'This may allow automatic login upon returning to this site. ' +
-  'You may remove your authoriztion server login at this link: ' +
+  'You may remove your authoriztion server login by visiting the link at: ' +
   '<a href="' + config.oauth2.authURL + '/logout">' + config.oauth2.authURL + '/logout</a>.' +
+  ' ' +
+  '<a href="' + config.oauth2.authURL + '/logout"><button>Auth Logout</button></a>' +
   logout2Html;
 exports.logout = (req, res, next) => {
   req.logout();

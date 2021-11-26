@@ -1,0 +1,43 @@
+html {
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+}
+body {
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+  background-color: #fadd7d;
+}
+
+.header-font {
+  font-size: 125%
+}
+.head-fixed {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  z-index: 4;
+}
+.head-flex {
+  margin-top: 0px;
+  background-color: #ffca1c;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px 5px 10px;
+  margin-bottom: 5px;
+}
+
+.head-left {
+  display: inline;
+}
+
+.head-center {
+  display: inline;
+}
+
+.head-right {
+  display: inline;
+  padding-right: 10px;
+}

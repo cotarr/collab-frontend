@@ -21,13 +21,13 @@ const compression = require('compression');
 const app = express();
 const passport = require('passport');
 const logout = require('./auth/logout');
+const unAuthRoute = require('./auth/unauth-route');
 
 // Custom Modules
 const checkVhost = require('./middlewares/check-vhost');
 const robotPolicy = require('./utils/robot-policy');
 const securityContact = require('./utils/security-contact');
-const ensureAuthenticated = require('./auth/auth-check').ensureAuthenticated;
-const denyUnauthorized = require('./auth/auth-check').denyUnauthorized;
+const auth = require('./auth/auth-check');
 
 // Route Handlers
 const apiProxy = require('./routes/api-proxy');
@@ -157,6 +157,12 @@ app.get('/robots.txt', robotPolicy);
 // new authorization workflow to start
 app.get('/favicon.ico', (req, res) => { res.end(); });
 
+// -----------------------------
+// Unauthorized Landing Page
+// -----------------------------
+app.get('/unauthorized.html', unAuthRoute.unAuthHtml);
+app.get('/unauthorized.css', unAuthRoute.unAuthStyles);
+
 // -------------------------
 // Authorizaton Routes
 // -------------------------
@@ -185,7 +191,7 @@ app.get('/logout.css', logout.logoutServeCss);
 // Redirect user to authorization server to change password
 // ---------------------------------------------------------
 app.get('/changepassword',
-  denyUnauthorized,
+  auth.check(),
   (req, res) => { res.redirect(config.oauth2.authURL + '/changepassword'); }
 );
 
@@ -193,7 +199,7 @@ app.get('/changepassword',
 //     API routes
 // --------------------
 app.get('/userinfo',
-  denyUnauthorized,
+  auth.check(),
   userinfo
 );
 
@@ -202,7 +208,7 @@ app.get('/userinfo',
 // This info is not intended for use by end user.
 // ----------------------------------------------------------------------
 app.get('/proxy/oauth/introspect',
-  denyUnauthorized,
+  auth.check(),
   introspect
 );
 
@@ -210,7 +216,7 @@ app.get('/proxy/oauth/introspect',
 // Mock REST API
 // ----------------
 app.use('/api',
-  denyUnauthorized,
+  auth.check(),
   apiProxy
 );
 
@@ -218,7 +224,7 @@ app.use('/api',
 // Authenticated status
 // -----------------------
 app.get('/secure',
-  denyUnauthorized,
+  auth.check(),
   (req, res) => res.json({ secure: 'ok' })
 );
 
@@ -228,7 +234,7 @@ app.get('/secure',
 const secureDir = path.join(__dirname, '../secure');
 console.log('Serving files from: ' + secureDir);
 app.use(
-  ensureAuthenticated,
+  auth.check({ redirectURL: '/unauthorized.html' }),
   express.static(secureDir)
 );
 

@@ -34,6 +34,13 @@
 //
 //            Therefore, the issued token scope is ["read"]
 //
+//  Added to session storage:
+//    req.session.passport.user.ticket = {
+//      access_token: 'xxxxxx',
+//      refresh_token: 'xxxxxx',
+//      exp: 1637786886
+//    }
+//
 // -----------------------------------------------------------------
 'use strict';
 
@@ -55,11 +62,21 @@ const oauth2Strategy = new OAuth2Strategy(
   },
   function (accessToken, refreshToken, profile, cb) {
     if ((!(accessToken == null)) && (accessToken.length > 0)) {
-      return cb(null, {
-        ticket: {
-          access_token: accessToken
-        }
-      });
+      const ticket = {
+        access_token: accessToken
+      };
+      if ((!(refreshToken == null)) && (refreshToken.length > 0)) {
+        ticket.refresh_token = refreshToken;
+      }
+      // extract expiration time in unix seconds from base64 encoded token payload.
+      try {
+        ticket.exp =
+          parseInt(JSON.parse(Buffer.from(accessToken.split('.')[1], 'base64').toString()).exp);
+      } catch (error) {
+        console.log(error.toString() || error);
+        delete ticket.exp;
+      }
+      return cb(null, { ticket });
     } else {
       const err = new Error('Invalid access_token during login');
       cb(err);
