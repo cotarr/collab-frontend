@@ -27,6 +27,15 @@ const config = require('../config');
 //
 // Unexpected errors return status 401 to user
 //
+// --------------------------------------
+
+//
+// Renew access token if time remaining is leass than this value.
+//
+const renewWindowSec = 10;
+//
+// Authorizaiton Middleware
+//
 exports.check = (options) => {
   const _options = options || {};
 
@@ -69,7 +78,10 @@ exports.check = (options) => {
       return next(err);
 
     // Compare expiration time to system current time. Is the access token expired?
-    } else if (Math.floor(new Date().getTime() / 1000) < parseInt(req.user.ticket.exp)) {
+    } else if ((Math.floor(new Date().getTime() / 1000) + renewWindowSec) <
+      parseInt(req.user.ticket.exp)) {
+      // Case of: Not expired
+      //
       // If saved URL, then removed saved URL
       if ((_options.redirectURL) && (_options.redirectURL.length > 0) &&
         (req.session) && (req.session.returnTo)) {
