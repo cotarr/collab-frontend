@@ -96,19 +96,23 @@ app.use(checkVhost.rejectNotVhost);
 const sessionOptions = {
   name: 'collab-frontend.sid',
   proxy: false,
-  rolling: true,
+  rolling: config.session.rollingCookie,
   resave: false,
   saveUninitialized: false,
   secret: config.session.secret,
   cookie: {
     path: '/',
-    // express-session takes maxAge in milliseconds
-    maxAge: config.session.maxAge,
+    maxAge: null,
     secure: config.server.tls,
     httpOnly: true,
     sameSite: 'Lax'
   }
 };
+// Session cookie clears when browser is closed.
+if (!config.session.setSessionCookie) {
+  // express-session takes cookie.maxAge in milliseconds
+  sessionOptions.cookie.maxAge = config.session.maxAge;
+}
 
 const sessionStore = {};
 if (config.session.enableRedis) {
@@ -119,17 +123,21 @@ if (config.session.enableRedis) {
   console.log('Using redis for session storage');
   sessionStore.redis = require('redis');
   sessionStore.RedisStore = require('connect-redis')(session);
-  const redisOptions = {};
+  const redisClientOptions = {};
   // must match /etc/redis/redis.conf "requirepass <password>"
   if ((config.session.redisPassword) && (config.session.redisPassword.length > 0)) {
-    redisOptions.password = config.session.redisPassword;
+    redisClientOptions.password = config.session.redisPassword;
   }
-  sessionStore.redisClient = sessionStore.redis.createClient(redisOptions);
-  sessionOptions.store = new sessionStore.RedisStore({
+  sessionStore.redisClient = sessionStore.redis.createClient(redisClientOptions);
+  const redisStoreOptions = {
     client: sessionStore.redisClient,
     prefix: config.session.redisPrefix
-    // ttl: (inherits from cookie)
-  });
+    // redis uses Cookie ttl for session expire, unless session cookie, (see next)
+  };
+  if (config.session.setSessionCookie) {
+    redisStoreOptions.ttl = config.session.ttl;
+  }
+  sessionOptions.store = new sessionStore.RedisStore(redisStoreOptions);
 } else {
   console.log('Using memorystore for session storage');
   sessionStore.MemoryStore = require('memorystore')(session);
@@ -137,7 +145,8 @@ if (config.session.enableRedis) {
     // memorystore in milliseconds
     ttl: config.session.maxAge,
     stale: true,
-    checkPeriod: 86400000 // prune every 24 hours
+    // Memorystore takes prune time in milliseconds
+    checkPeriod: config.session.pruneInterval * 1000
   });
 }
 app.use(session(sessionOptions));

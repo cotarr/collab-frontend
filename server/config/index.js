@@ -25,8 +25,13 @@ exports.server = {
 };
 
 exports.session = {
+  rollingCookie: (process.env.SESSION_SET_ROLLING_COOKIE === 'true') || false,
+  setSessionCookie: (process.env.SESSION_SET_SESSION_COOKIE === 'true') || false,
+  // 604800 = 7 days (7 * 24 * 3600)
   maxAge: parseInt(process.env.SESSION_EXPIRE_SEC || '604800') * 1000,
-  ttl: parseInt(process.env.SESSION_EXPIRE_SEC || '608400'),
+  ttl: parseInt(process.env.SESSION_EXPIRE_SEC || '604800'),
+  // pruneInterval applies only to Memorystore, redis will ignore
+  pruneInterval: parseInt(process.env.SESSION_PRUNE_INTERVAL_SEC || '86400'),
   secret: process.env.SESSION_SECRET || 'Change Me',
   enableRedis: (process.env.SESSION_ENABLE_REDIS === 'true') || false,
   redisPrefix: process.env.SESSION_REDIS_PREFIX || 'session:',
