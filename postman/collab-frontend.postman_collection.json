@@ -46,7 +46,49 @@
 			"response": []
 		},
 		{
-			"name": "/ (redirect /login)",
+			"name": "(clear global variables)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Unset global variables\", function () {",
+							"    pm.globals.unset('transaction_id');",
+							"    pm.globals.unset('auth_code');",
+							"    pm.globals.unset('access_token');",
+							"    pm.globals.unset('refresh_token');",
+							"    pm.globals.unset('csrf_token');",
+							"    pm.globals.unset('testUsername');   ",
+							"    pm.globals.unset('testUserNumber');",
+							"    pm.globals.unset('testUserNumber');",
+							"    pm.globals.unset('createdUserUuid');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/logout",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/ (redirect /unauthorized)",
 			"event": [
 				{
 					"listen": "test",
@@ -56,10 +98,10 @@
 							"    pm.response.to.have.status(302);",
 							"});",
 							"",
-							"pm.test(\"Redirect address is /login\", function () {",
+							"pm.test(\"Redirect address is /unauthorized.html\", function () {",
 							"    let location = pm.response.headers.get('Location');",
 							"    location = location.split('?')[0];",
-							"    pm.expect(location).to.equal('/login');",
+							"    pm.expect(location).to.equal('/unauthorized');",
 							"});",
 							""
 						],
@@ -77,6 +119,38 @@
 					],
 					"path": [
 						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/unauthorized (submit /login)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{frontend_host}}/unauthorized",
+					"host": [
+						"{{frontend_host}}"
+					],
+					"path": [
+						"unauthorized"
 					]
 				}
 			},
@@ -202,7 +276,7 @@
 			"response": []
 		},
 		{
-			"name": "(auth-2) /login (form)",
+			"name": "(auth-2) /login (form, csrfToken)",
 			"event": [
 				{
 					"listen": "test",
@@ -210,7 +284,22 @@
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
-							"});"
+							"});",
+							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    // console.log('csrf_token: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
+							"});",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -284,6 +373,11 @@
 							"key": "password",
 							"value": "{{user_password}}",
 							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
+							"type": "text"
 						}
 					],
 					"options": {
@@ -340,6 +434,22 @@
 							"      pm.globals.set('auth_code', authCode)",
 							"    } else {",
 							"        pm.globals.set('auth_code', '');",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    // console.log('csrf_token: ', csrfToken);",
+							"    if (csrfToken.length > 0) {",
+							"        pm.globals.set('csrf_token', csrfToken);",
 							"    }",
 							"});",
 							""
@@ -431,6 +541,11 @@
 							"key": "transaction_id",
 							"value": "{{transaction_id}}",
 							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
+							"type": "text"
 						}
 					],
 					"options": {
@@ -501,7 +616,7 @@
 			"response": []
 		},
 		{
-			"name": "/ (with valid cookie)",
+			"name": "/ (with cookie, get csrfToken)",
 			"event": [
 				{
 					"listen": "test",
@@ -515,17 +630,18 @@
 							"    pm.expect(pm.response.text()).to.include('<title>collab-frontend</title>');",
 							"});",
 							"",
-							"",
-							"// const jar = pm.cookies.jar();",
-							"// jar.getAll('localhost', (err, cookies) => {",
-							"//     if (err) {",
-							"//         console.log(err);",
-							"//     } else {",
-							"//         console.log(cookies);",
-							"//     }",
-							"// });",
-							"",
-							"// console.log(pm.cookies.has('collab-frontend-sid'))"
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    let splitByQuote = bodyArray[5].split('\"');",
+							"    if (splitByQuote[1] === 'csrf-token') {",
+							"        csrfToken = splitByQuote[3];",
+							"    }",
+							"    // console.log('csrf_token: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
+							"});",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -582,6 +698,190 @@
 			"response": []
 		},
 		{
+			"name": "/api/v1/data/manual-data/",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"435bf533-7280-4dce-a9d0-2960b43019f9\",\n    \"weather\": \"Partly Cloudy\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{frontend_host}}/api/v1/data/manual-data/435bf533-7280-4dce-a9d0-2960b43019f9",
+					"host": [
+						"{{frontend_host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"manual-data",
+						"435bf533-7280-4dce-a9d0-2960b43019f9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/v1/data/manual-data/",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Your test name\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.weather).to.equal('Partly Cloudy');",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{frontend_host}}/api/v1/data/manual-data/435bf533-7280-4dce-a9d0-2960b43019f9",
+					"host": [
+						"{{frontend_host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"manual-data",
+						"435bf533-7280-4dce-a9d0-2960b43019f9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/v1/data/manual-data/id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"435bf533-7280-4dce-a9d0-2960b43019f9\",\n    \"weather\": \"Raining\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{frontend_host}}/api/v1/data/manual-data/435bf533-7280-4dce-a9d0-2960b43019f9",
+					"host": [
+						"{{frontend_host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"manual-data",
+						"435bf533-7280-4dce-a9d0-2960b43019f9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/v1/data/manual-data/",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Your test name\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.weather).to.equal('Raining');",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{frontend_host}}/api/v1/data/manual-data/435bf533-7280-4dce-a9d0-2960b43019f9",
+					"host": [
+						"{{frontend_host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"data",
+						"manual-data",
+						"435bf533-7280-4dce-a9d0-2960b43019f9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "/status (clear localhost cookies)",
 			"event": [
 				{
@@ -631,10 +931,10 @@
 							"    pm.response.to.have.status(302);",
 							"});",
 							"",
-							"pm.test(\"Redirect address is /login\", function () {",
+							"pm.test(\"Redirect address is /unauthorized.html\", function () {",
 							"    let location = pm.response.headers.get('Location');",
 							"    location = location.split('?')[0];",
-							"    pm.expect(location).to.equal('/login');",
+							"    pm.expect(location).to.equal('/unauthorized');",
 							"});",
 							""
 						],
@@ -687,6 +987,48 @@
 						"v1",
 						"data",
 						"iot-data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(clear global variables)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Unset global variables\", function () {",
+							"    pm.globals.unset('transaction_id');",
+							"    pm.globals.unset('auth_code');",
+							"    pm.globals.unset('access_token');",
+							"    pm.globals.unset('refresh_token');",
+							"    pm.globals.unset('csrf_token');",
+							"    pm.globals.unset('testUsername');   ",
+							"    pm.globals.unset('testUserNumber');",
+							"    pm.globals.unset('testUserNumber');",
+							"    pm.globals.unset('createdUserUuid');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/logout",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"logout"
 					]
 				}
 			},

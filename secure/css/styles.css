@@ -8,6 +8,9 @@ body {
   background-color: #fadd7d;
 }
 
+h3 {
+  margin-left: 10px;
+}
 .info-div {
   border: 1px solid black;
   border-radius: 8px;
@@ -26,6 +29,12 @@ body {
 }
 .lm-20 {
   margin-left: 20px;
+}
+.vs-10 {
+  height: 10px;
+}
+.vs-20 {
+  height: 20px;
 }
 
 .footer {

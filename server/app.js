@@ -9,6 +9,7 @@
 // native node packages
 const http = require('http');
 const path = require('path');
+const fs = require('fs');
 
 // express packages
 const express = require('express');
@@ -16,7 +17,8 @@ const session = require('express-session');
 const logger = require('morgan');
 const logConfig = require('./utils/log-config');
 const helmet = require('helmet');
-
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: false });
 const compression = require('compression');
 const app = express();
 const passport = require('passport');
@@ -205,7 +207,7 @@ app.get('/favicon.ico', function (req, res, next) {
 // -----------------------------
 // Unauthorized Landing Page
 // -----------------------------
-app.get('/unauthorized.html', unAuthRoute.unAuthHtml);
+app.get('/unauthorized', unAuthRoute.unAuthHtml);
 app.get('/unauthorized.css', unAuthRoute.unAuthStyles);
 
 // -------------------------
@@ -257,11 +259,22 @@ app.get('/proxy/oauth/introspect',
   introspect
 );
 
-// ----------------
+// -----------------------------------------------------
 // Mock REST API
-// ----------------
+//
+// The request is checked for a valid user cookie.
+//
+// The request uses csurf middleware to reject
+// requests not having proper csrf token (403 Forbidden).
+// Methods GET and HEAD are excluded from the check.
+//
+// All requests to /api are handled using express-proxy
+// in the apiProxy route handler. Oauth 2.0 access_tokens
+// are added by the apiProxy middleware.
+// -----------------------------------------------------
 app.use('/api',
   auth.check(),
+  csrfProtection,
   apiProxy
 );
 
@@ -273,13 +286,48 @@ app.get('/secure',
   (req, res) => res.json({ secure: 'ok' })
 );
 
+// File path to static web site
+const secureDir = path.join(__dirname, '../secure');
+
+// ----------------------------------------------------
+// This is a simple render middleware function to
+// substitute the {{csrf-token}} string for a random
+// generated CSRF token.
+//
+// The npm module csurf is used to reduce the risk of
+// cross-origin submissions using the user's cookie.
+// Csurf middleware will insert a req.csrfToken() function
+// into the req object to generate new tokens.
+// ----------------------------------------------------
+const insertCsrfTokenToHtmlPage = function (pageFilename) {
+  return [
+    auth.check({ redirectURL: '/unauthorized' }),
+    csrfProtection,
+    function (req, res, next) {
+      return fs.readFile(secureDir + pageFilename, 'utf8', function (err, data) {
+        if (err) {
+          return res.status(404).send('Not Found');
+        } else {
+          return res.send(data.replace('{{csrfToken}}', req.csrfToken()));
+        }
+      });
+    }
+  ];
+};
+// ------------------------------------------------
+// Pages to be rendered with CSRF token inserted.
+// ------------------------------------------------
+app.get('/', insertCsrfTokenToHtmlPage('/index.html'));
+app.get('/index.html', insertCsrfTokenToHtmlPage('/index.html'));
+
 // -------------------------------
 // Web server for static files
+// All static files require authorization
+// using a valid cookie.
 // -------------------------------
-const secureDir = path.join(__dirname, '../secure');
 console.log('Serving files from: ' + secureDir);
 app.use(
-  auth.check({ redirectURL: '/unauthorized.html' }),
+  auth.check({ redirectURL: '/unauthorized' }),
   express.static(secureDir)
 );
 

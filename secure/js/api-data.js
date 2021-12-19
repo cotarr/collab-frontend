@@ -42,7 +42,7 @@ const getTestApiData = (endpointUrl) => {
       document.getElementById('apiDataText').textContent = JSON.stringify(json, null, 2);
       if ((Array.isArray(json)) && (json.length === 0)) {
         document.getElementById('apiErrorText').textContent =
-          '[ ] indicates an empty array. ' +
+          'Success. [ ] indicates an empty array. ' +
           'It is likely the emulated IOT device has not submitted any data.';
       } else {
         document.getElementById('apiErrorText').textContent = '';
@@ -51,7 +51,7 @@ const getTestApiData = (endpointUrl) => {
     .catch((err) => {
       console.log(err);
       document.getElementById('apiDataText').textContent = '';
-      document.getElementById('apiErrorText').textContent = err.message;
+      document.getElementById('apiErrorText').textContent = err.message || err.toString();
     });
 }; // getTestApiData()
 

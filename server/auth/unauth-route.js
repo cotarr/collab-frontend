@@ -5,7 +5,7 @@
 // Example implementation
 // ---------------------------------------
 //
-//   app.get('/unauthorized.html', unAuthRoute.unAuthHtml);
+//   app.get('/unauthorized', unAuthRoute.unAuthHtml);
 //   app.get('/unauthorized.css', unAuthRoute.unAuthStyles);
 //
 // ---------------------------------------

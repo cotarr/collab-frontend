@@ -2,10 +2,13 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="csrf-token" content="{{csrfToken}}">
     <title>collab-frontend</title>
     <link rel="stylesheet" href="css/styles.css">
     <script src="./js/main.js" defer></script>
     <script src="./js/api-data.js" defer></script>
+    <script src="./js/manual-data.js" defer></script>
   </head>
   <body>
     <div class="head-fixed">
@@ -54,12 +57,12 @@
         </p>
       </div>
 
-      <div class='button-div'>
+      <div class="button-div">
         <button id="clearDisplayButton">Clear</button>
         <button id="iotDataButton">Fetch Data</button>
         <span>GET /api/v1/data/iot-data/</span>
       </div>
-      <div class='button-div'>
+      <div class="button-div">
       </div>
       <div class="info-div" >
         <pre id="apiDataText"></pre>
@@ -73,17 +76,17 @@
           Normally a user would never possess an access_token, and
           therefore never have the need to validate a token.
           In the frontend web server, there is a temporary development route
-          &quot;/proxy/oauth/introspect&quot that will submit the users's
+          &quot;/proxy/oauth/introspect&quot that will submit the users"s
           access_token to the authorization server
           &quot;/oauth/introspect&quot; route.
           The introspect endpoint validates the token and returns various
-          information about the user's access_token that was submitted.
+          information about the user"s access_token that was submitted.
           It is included here to show example response content.
           The typical useful properties are: <b>active, scope, and user</b>.
         </p>
       </div>
 
-      <div class='button-div'>
+      <div class="button-div">
         <button id="clearIntrospectButton">Clear</button>
         <button id="introspectButton">Fetch Data</button>
         <span>/proxy/oauth/introspect</span>
@@ -94,14 +97,14 @@
       </div>
 
       <h3>Userinfo Endpoint</h3>
-        <div class="description-contents">
+      <div class="description-contents">
         <p>
           The <b>/userinfo</b> endpoint is intended for use in determining
-          user's current login status.
+          user"s current login status.
           The response includes the logged in user name for display on the page (see header above)
         </p>
       </div>
-      <div class='button-div'>
+      <div class="button-div">
         <button id="clearUserinfoButton">Clear</button>
         <button id="userinfoButton">Fetch Data</button>
         <span>/userinfo (for update page header)</span>
@@ -111,8 +114,55 @@
         <div class="error-text" id="userinfoErrorText"></div>
       </div>
 
+      <h3>Manual Data Entry</h3>
+      <div class="description-contents">
+        <p>
+          This is an example where a user can enter data to the web browser,
+          sent to the web server, through the reverse proxy, to the backend 
+          database API. An existing record referenced by id (uuid) is modified to a new value.
+          In this case, the Oauth 2.0 access_token added to 
+          the request as it passes through the web server reverse proxy for
+          token validation by the backend API.
+        </p>
+        <p>
+          Independent of oauth, in this example the web browser will extract a random CSRF token 
+          from a meta tag in the index.html file and insert the CSRF token to the PATCH request.
+          This is to reduce the risk of cross-site data submission using the user's cookie.
+          A checkbox may be used to disable the header to show the frontend web server 
+          properly rejects the request.
+        </p>
+        <p>
+          This example also includes a character allow list used to sanitize user input.
+          This can be demonstrated by attempting to submit a string including
+          symbols like $ # &lt; &gt;. Input data validation should reject the 
+          request with 422 status.
+        </p>
+      </div>
+      <div class="button-div">
+        <button id="manualEditButton2">Read Data</button>
+        <span>GET &quot;/api/v1/data/iot-data/435bf533-7280-4dce-a9d0-2960b43019f9&quot;</span>
+      </div>      <div class="button-div">
+        <input type="checkbox" id="csrfHeaderCheckbox" name="csrfHeader" checked />
+        <span>Add Header: &quot;CSRF-Token&quot;</span>
+        <span id="currentCsrfTokenValue"></span>
+      </div>
+      <div class="button-div">
+        <label for="weather">Weather:</label>
+        <input type="text" name="weather" id="weatherInputEl"
+        minlength="1" maxlength="30" value="Sunny">
+        <span>(Restricted: a-z, A-Z, 0-9, space)</span>
+    </div>
+      <div class="button-div">
+        <button id="manualEditButton1">Write Data</button>
+        <span>PATCH &quot;/api/v1/data/iot-data/435bf533-7280-4dce-a9d0-2960b43019f9&quot;</span>
+      </div>
+      <div class="info-div" >
+        <pre id="manualEditText"></pre>
+        <div class="error-text" id="manualEditErrorText"></div>
+      </div>
+
       <h3>User Password Change</h3>
-        <div class="description-contents">
+      <div class="description-contents">
         <p>
           A web page will typically include a link that the user may use to
           change their user password. In this case, the frontend web server
@@ -120,11 +170,11 @@
           authorization server.
         </p>
       </div>
-      <div class='button-div'>
+      <div class="button-div">
         <a href="/changepassword"><button>Change Password</button></a>
         <span>/changepassword will redirect to authorization server.</span>
       </div>
-  
+
       <div class="footer">
         Collab-frontend demo page.
       </div>

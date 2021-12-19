@@ -73,12 +73,12 @@ document.getElementById('clearUserinfoButton').addEventListener('click', () => {
 const loadCallback = (err, data) => {
   if (err) {
     document.getElementById('headerName').textContent = '';
-    window.location = '/unauthorized.html';
+    window.location = '/unauthorized';
   } else if ((data) && ('name' in data)) {
     document.getElementById('headerName').textContent = data.name;
   } else {
     document.getElementById('headerName').textContent = '';
-    window.location = '/unauthorized.html';
+    window.location = '/unauthorized';
   }
 }; // loadCallback()
 
