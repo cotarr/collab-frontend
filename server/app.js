@@ -85,7 +85,6 @@ const contentSecurityPolicy = {
     baseUri: ["'self'"],
     connectSrc: ["'self'"],
     imgSrc: ["'self'"],
-    mediaSrc: ["'self'"],
     scriptSrc: ["'self'"],
     styleSrc: ["'self'"],
     formAction: ["'none'"],
