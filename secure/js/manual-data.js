@@ -112,7 +112,7 @@ const patchManualEditData = (endpointUrl, data) => {
       }
     })
     .then((json) => {
-      console.log(JSON.stringify(json, null, 2));
+      // conso  le.log(JSON.stringify(json, null, 2));
       document.getElementById('manualEditText').textContent =
         'Success, response status=' + json.status.toString() + ' OK';
       document.getElementById('manualEditErrorText').textContent = '';
@@ -132,7 +132,7 @@ document.getElementById('manualEditButton1').addEventListener('click', () => {
     id: '435bf533-7280-4dce-a9d0-2960b43019f9'
   };
   data.weather = document.getElementById('weatherInputEl').value;
-  console.log(JSON.stringify(data, null, 2));
+  // console.log(JSON.stringify(data, null, 2));
   patchManualEditData('/api/v1/data/manual-data/435bf533-7280-4dce-a9d0-2960b43019f9', data);
 });
 

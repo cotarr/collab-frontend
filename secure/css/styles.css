@@ -8,7 +8,7 @@ body {
   background-color: #fadd7d;
 }
 
-h3 {
+.h3-style {
   margin-left: 10px;
 }
 .info-div {
@@ -90,8 +90,30 @@ h3 {
   background-color: #fff2c7;
 }
 
+.form-test {
+  background-color: #e5ccf2;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-bottom: 10px; 
+  border: 1px solid black;
+  border-radius: 8px;
+  margin-left: 10px;
+}
+
+.form-code {
+  background-color: white;
+  border: 1px solid black;
+  font-size: 75%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
 .error-text {
   color: red;
+}
+
+yellow {
+  background-color: yellow;
 }
 
 .image {

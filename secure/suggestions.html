@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="csrf-token" content="{{csrfToken}}">
+    <title>collab-frontend - Suggestions</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="./js/main.js" defer></script>
+    <script src="./js/manual-data.js" defer></script>
+  </head>
+  <body>
+    <div class="head-fixed">
+      <div class="head-flex">
+        <div class="head-left header-font">
+          <a href="/"><button>Home</button></a>
+          Security Suggestions
+        </div>
+        <div class="head-right">
+          <span id="headerName"></span>
+          <a href="/logout"><button>Logout</button></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="scrollable-div"></div>
+      <div class="description-contents">
+        <p>
+          Although this was a learning project involving Oauth 2.0, 
+          some general security tips were identified. This page 
+          is intended to be an example to show a few security suggestions.
+          These are not part of Oauth, but you may find them interesting.
+          There is more information in the help documentation for the 
+          collab_auth repository for this project.
+        </p>
+      </div>
+
+      <h3 class="h3-style">User Input</h3>
+      <div class="description-contents">
+        <p>
+          It is a good practive to sanitize user input.
+          This can reduce the risk that embedded command characters could 
+          insert script tags or SQL commands as input to a database.
+          In this example, the backend API server uses express-validator to 
+          implement a character filter to sanitize user input.
+          In the example below, this can be demonstrated by attempting to submit a string including
+          symbols like ; $ { } &lt; &gt;. Input data validation should identify 
+          these characters as unsafe and reject the request with 422 status.
+        </p>
+        <p>
+          Additionally or alternately, input can be encoded to convert 
+          command characters to safe equivalent. The example below uses 
+          a filter or character &quot;allow list&quot; instead.
+        </p>
+      </div>
+
+      <h3 class="h3-style">Cross-site Data Submission Mitigations</h3>
+      <div class="description-contents">
+        <p>
+          Browser data submission can include some risk that a user's cookie for one site
+          can be used to authorize cross-site data submission by another site's 
+          web page when loaded in the same browser. 
+          When running a Node/Express web server, the npm package 
+          <a href="https://github.com/expressjs/csurf">csurf</a>
+          is one of several methods that can be used to reduce this risk.
+          The frontend web server can use the csurf middleware to insert a random csrf token into a 
+          web page HTML file as a meta tag attribute.
+          Subsequent API calls can extract the random token and include the token with an API request.
+          The frontend web server will then match the random token in the API request against the 
+          token embedded into the HTML web page before forwarding the request to the reverse proxy.
+          A new random token is created each time the HTML page is loaded of refreshed.
+          The token is unique to a specific user. 
+          Methods GET and HEAD are exempt because they do not submit data. 
+        </p>
+        <p>
+          This is an example where a user can enter data into the web browser,
+          submit to the web server, through the reverse proxy, to the backend 
+          database API. An existing database record referenced by id (uuid) is modified to a new value.
+          Similar to the examples on the main page, the frontend web server will add 
+          the oauth 2.0 access_token to the request as it passes through 
+          the web server reverse proxy for token validation by the backend
+          API before handling the request.
+        </p>
+        <p>
+          To clarify, there are two different types of token. 
+          The csrf token is between web browser and web server. 
+          The oauth access_token is between the frontend web server and backend database server.
+          In the example below, a checkbox had been added to disable the csrf token header 
+          in the browser in order to show that the frontend web server properly rejects the request.
+          (Note: this has nothing to do with oauth tokens.)
+        </p>
+        <p>
+          To try this: 1) Read the weather, 2) Write alternate value, 
+          3) Read again to see your change.
+        </p>
+      </div>
+
+      <div class="lm-20">Example using JavaScript to send API requests.</div>
+      <div class="vs-10"></div>
+      <div class="button-div">
+        <button id="manualEditButton2">Read Data</button>
+        <span>GET &quot;/api/v1/data/manual-data/update/435bf533-7280-4dce-a9d0-2960b43019f9&quot;</span>
+      </div>      <div class="button-div">
+        <input type="checkbox" id="csrfHeaderCheckbox" name="csrfHeader" checked />
+        <span>Add Header: &quot;CSRF-Token&quot;</span>
+        <span id="currentCsrfTokenValue"></span>
+      </div>
+      <div class="button-div">
+        <label for="weather">Weather:</label>
+        <input type="text" name="weather" id="weatherInputEl"
+        minlength="1" maxlength="30" value="Sunny">
+        <span>(Restricted: a-z, A-Z, 0-9, space)</span>
+      </div>
+      <div class="button-div">
+        <button id="manualEditButton1">Write Data</button>
+        <span>PATCH &quot;/api/v1/data/manual-data/435bf533-7280-4dce-a9d0-2960b43019f9&quot;</span>
+      </div>
+      <div class="info-div" >
+        <pre id="manualEditText"></pre>
+        <div class="error-text" id="manualEditErrorText"></div>
+      </div>
+
+      <div class="description-contents">
+        <p>
+          The next example shows a simple &lt;form&gt; element 
+          with a submit button is used to make 
+          a data submission without using JavaScript.
+          In order to receive a form POST request, the API includes a custom 
+          route for method POST to /v1/data/manual-data/update/.
+          This is equivalent to method PATCH /vi/data/manual-data/.
+        </p>
+        <p>
+          The form contains an &lt;input&gt; element that is submitted as a 
+          &quot;_csrf&quot; property containing a 
+          valid csrf token. This will allow the request to be accepted by 
+          the csurf middleware in the frontend web server. 
+          Press [Write Data] below. Since this is a form submission,
+          there is no automatic update to the page. You can review the data using 
+          the [Read Data] button above.
+        </p>
+<pre class="form-code">
+  &lt;form action="/api/v1/data/manual-data/update/435bf533-7280-4dce-a9d0-2960b43019f9" method="post"&gt;
+    <yellow>&lt;input type="hidden" name="_csrf" value="{{csrfToken}}"&gt;</yellow>
+    &lt;input type="hidden" name="id" value="435bf533-7280-4dce-a9d0-2960b43019f9"&gt;
+    &lt;label for="weather"&gt;Weather:&lt;/label&gt;
+    &lt;input type="text" name="weather" value="Windy"&gt;
+    &lt;button type="submit"&gt;Write Data&lt;/button&gt;
+  &lt;/form&gt;
+</pre>
+      </div>
+      <div class="lm-20">Form data with csrf token</div>
+      <div class="vs-10"></div>
+      <div class='form-test'>
+        <form action="/api/v1/data/manual-data/update/435bf533-7280-4dce-a9d0-2960b43019f9" method="post">
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <input type="hidden" name="id" value="435bf533-7280-4dce-a9d0-2960b43019f9">
+          <label for="weather">Weather:</label>
+          <input type="text" name="weather" value="Windy">
+          <button type="submit">Write Data</button>
+        </form>
+      </div>
+
+      <div class="description-contents">
+        <p>
+          The next example show the form without the &quot;_csrf&quot; property.
+          It is otherwise the same as the previous request.
+          This is expected to fail. 
+        </p>
+        <p>
+          If this form were embedded in another web site's HTML page with 
+          proper URL, and the user is tricked to click the submit button,
+          the omission of the csrf token would reduce risk of cross-site vunerabiltiy.
+        </p>
+        <p>
+          This was perhaps an over simplification. 
+          There are many other mitigations that can be used to address the risk 
+          of cross site issues, such as a web browser's security policies.
+          In this test, the URL of the test is the same origin as 
+          the main HTML web page, thus avoiding these other mitigations.
+          Thus, we can demonstrate a successful submit with csrf token, then follow
+          by showing cross-site protection when the token is omitted.
+
+        </p>
+<pre class="form-code">
+  &lt;form action="/api/v1/data/manual-data/update/435bf533-7280-4dce-a9d0-2960b43019f9" method="post"&gt;
+    &lt;input type="hidden" name="id" value="435bf533-7280-4dce-a9d0-2960b43019f9"&gt;
+    &lt;label for="weather"&gt;Weather:&lt;/label&gt;
+    &lt;input type="text" name="weather" value="Heavy Snow"&gt;
+    &lt;button type="submit"&gt;Write Data&lt;/button&gt;
+  &lt;/form&gt;
+</pre>
+      </div>
+      <div class="lm-20">Form Data without csrf token</div>
+      <div class="vs-10"></div>
+      <div class='form-test'>
+        <form action="/api/v1/data/manual-data/update/435bf533-7280-4dce-a9d0-2960b43019f9" method="post">
+          <input type="hidden" name="id" value="435bf533-7280-4dce-a9d0-2960b43019f9">
+          <label for="weather">Weather:</label>
+          <input type="text" name="weather" value="Heavy Snow">
+          <button type="submit">Write Data</button>
+        </form>
+      </div>
+
+      <h3 class="h3-style">Content Security Policy (CSP)</h3>
+      <div class="description-contents">
+        <p>
+          Modern web browsers have default security policies that place restrictions
+          on the URL locations that a web page is allowed to interact with.
+          A Content Security Policy (CSP) is an optional set of policies that can be
+          specified by a web server when it offers a web page for download.
+          A compliant web browser would be expected to enforce these policies.
+          In the case of this page, the javascript, css styles, image files, 
+          and API calls all connect to the same web server from which
+          the main HTML file was loaded. Use of a reverse proxy with oauth access_tokens 
+          eliminates the need for the browser to connect to different sites.
+          Therefore, overall security risk can be improved by tightening the CSP.
+          There are many CSP tutorials available online.
+          To view the CSP, open the web browser developer tools, open the network tab,
+          refresh this page, select the main page, review the 'Response Headers'.
+          The CSP for this page should look something similar to the following example:
+        </p>
+      </div>
+
+      <div class="info-div" >
+        Content-Security-Policy: default-src 'none';base-uri 'self';connect-src 'self';
+        img-src 'self';script-src 'self';style-src 'self';form-action 'self';frame-ancestors 'none'
+      </div>
+
+      <div class="footer">
+        Collab-frontend demo page.
+      </div>
+    </div>
+  </body>
+</html>

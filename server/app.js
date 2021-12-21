@@ -87,7 +87,7 @@ const contentSecurityPolicy = {
     imgSrc: ["'self'"],
     scriptSrc: ["'self'"],
     styleSrc: ["'self'"],
-    formAction: ["'none'"],
+    formAction: ["'self'"],
     frameAncestors: ["'none'"]
   },
   // Option to disable CSP while showing errors in console log.
@@ -307,7 +307,8 @@ const insertCsrfTokenToHtmlPage = function (pageFilename) {
         if (err) {
           return res.status(404).send('Not Found');
         } else {
-          return res.send(data.replace('{{csrfToken}}', req.csrfToken()));
+          // replace all instances of "{{csrfToken}}" using regular expressions
+          return res.send(data.replace(/\{\{csrfToken\}\}/g, req.csrfToken()));
         }
       });
     }
@@ -316,8 +317,7 @@ const insertCsrfTokenToHtmlPage = function (pageFilename) {
 // ------------------------------------------------
 // Pages to be rendered with CSRF token inserted.
 // ------------------------------------------------
-app.get('/', insertCsrfTokenToHtmlPage('/index.html'));
-app.get('/index.html', insertCsrfTokenToHtmlPage('/index.html'));
+app.get('/suggestions.html', insertCsrfTokenToHtmlPage('/suggestions.html'));
 
 // -------------------------------
 // Web server for static files

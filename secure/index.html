@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <script src="./js/main.js" defer></script>
     <script src="./js/api-data.js" defer></script>
-    <script src="./js/manual-data.js" defer></script>
+    <script src="./js/introspect-demo.js" defer></script>
   </head>
   <body>
     <div class="head-fixed">
@@ -29,7 +29,33 @@
         <img class="image" src="images/home-network-oauth2.png" alt="home network oauth2 network" width="1130" height="612">
       </div>
 
-      <h3>Try the API</h3>
+      <h3 class="h3-style">Overview</h3>
+
+      <div class="description-contents">
+        <p>
+          This git repository is one of 4 repositories that were 
+          created as a learning project to learn Oauth 2.0. The diagram above shows
+          the entire project with authorization server, mock web server, mock database server, 
+          and mock IOT device.
+        </p>
+        <p>
+          This web page and associated web server (collab-frontend) demonstrate how 
+          a user can interact with the overall project.
+          The diagram below shows the frontend web server at the center. 
+          The overall purpose of this page is to demonstrate the relationship 
+          between the user's cookie stored in the web browser on the left, the user's 
+          Oauth 2.0 access_token, stored in the frontend 
+          web server in the middle, and use of the token to access resources on the 
+          packend API server shown on the right.
+        </p>
+        <div class="center">
+          <img class="image" src="images/cookie-to-token.png" alt="Exchange cookie for access token" width="902" height="214">
+        </div>
+      </div>
+
+
+
+      <h3 class="h3-style">Try the API</h3>
 
       <div class="description-contents">
         <p>
@@ -69,7 +95,7 @@
         <div class="error-text" id="apiErrorText"></div>
       </div>
 
-      <h3>Interspect Endpoint</h3>
+      <h3 class="h3-style">Interspect Endpoint</h3>
       <div class="description-contents">
         <p>
           This button is for demonstration purposes only.
@@ -96,7 +122,7 @@
         <div class="error-text" id="introspectErrorText"></div>
       </div>
 
-      <h3>Userinfo Endpoint</h3>
+      <h3 class="h3-style">Userinfo Endpoint</h3>
       <div class="description-contents">
         <p>
           The <b>/userinfo</b> endpoint is intended for use in determining
@@ -114,91 +140,7 @@
         <div class="error-text" id="userinfoErrorText"></div>
       </div>
 
-      <h3>Manual Data Entry</h3>
-      <div class="description-contents">
-        <p>
-          This is an example where a user can enter data into the web browser,
-          submit to the web server, through the reverse proxy, to the backend 
-          database API. An existing database record referenced by id (uuid) is modified to a new value.
-          Similar to the examples above, the oauth 2.0 access_token is added to 
-          the request as it passes through the web server reverse proxy for
-          token validation by the backend API before handling the request.
-        </p>
-        <p>
-          Browser data submission can include some risk that a user's cookie for one site
-          can be used to authorize cross-site data submission by another site's 
-          web page when loaded in the same browser. One way to reduce this risk is to 
-          insert a random token into the web page HTML file.
-          Subsequent API calls can extract the random token and insert the token into API requests.
-          The frontend web server will then match the random token in the API request against the 
-          token embedded into the HTML web page before forwarding the request to the reverse proxy.
-          A new random token is created each time the HTML page is loaded of refreshed. 
-          Methods GET and HEAD are exempt because they do not submit data. 
-          A checkbox may be used to disable the header to show that the frontend web server 
-          properly rejects the request.
-          (Note: this has nothing to do with oauth tokens.)
-        </p>
-        <p>
-          This example also includes a character filter used to sanitize user input.
-          This can reduce the risk of inserting script tags or SQL commands.
-          This can be demonstrated by attempting to submit a string including
-          symbols like $ # &lt; &gt;. Input data validation should reject the 
-          request with 422 status.
-        </p>
-        <p>
-          To try this: 1) Read the weather, 2) Write alternate value, 
-          3) Read again to see your change.
-        </p>
-      </div>
-      <div class="button-div">
-        <button id="manualEditButton2">Read Data</button>
-        <span>GET &quot;/api/v1/data/manual-data/435bf533-7280-4dce-a9d0-2960b43019f9&quot;</span>
-      </div>      <div class="button-div">
-        <input type="checkbox" id="csrfHeaderCheckbox" name="csrfHeader" checked />
-        <span>Add Header: &quot;CSRF-Token&quot;</span>
-        <span id="currentCsrfTokenValue"></span>
-      </div>
-      <div class="button-div">
-        <label for="weather">Weather:</label>
-        <input type="text" name="weather" id="weatherInputEl"
-        minlength="1" maxlength="30" value="Sunny">
-        <span>(Restricted: a-z, A-Z, 0-9, space)</span>
-    </div>
-      <div class="button-div">
-        <button id="manualEditButton1">Write Data</button>
-        <span>PATCH &quot;/api/v1/data/manual-data/435bf533-7280-4dce-a9d0-2960b43019f9&quot;</span>
-      </div>
-      <div class="info-div" >
-        <pre id="manualEditText"></pre>
-        <div class="error-text" id="manualEditErrorText"></div>
-      </div>
-
-      <h3>Content Security Policy (CSP)</h3>
-      <div class="description-contents">
-        <p>
-          Modern web browsers have default security policies that place restrictions
-          on the URL locations that a web page is allowed to interact with.
-          A Content Security Policy (CSP) is an optional set of policies that can be
-          specified by a web server when it offers a web page for download.
-          A compliant web browser would be expected to enforce these policies.
-          In the case of this page, the javascript, css styles, image files, 
-          and API calls all connect to the same web server from which
-          the main HTML file was loaded. Use of a reverse proxy with oauth access_tokens 
-          eliminates the need for the browser to connect to different sites.
-          Therefore, overall security risk can be improved by tightening the CSP.
-          There are many CSP tutorials available online.
-          To view the CSP, open the web browser developer tools, open the network tab,
-          refresh this page, select the main page, review the 'Response Headers'.
-          The CSP should look something similar to the following example:
-        </p>
-      </div>
-
-      <div class="info-div" >
-        Content-Security-Policy: default-src 'none';base-uri 'self';connect-src 'self';
-        img-src 'self';script-src 'self';style-src 'self';form-action 'none';frame-ancestors 'none'
-      </div>
-
-      <h3>User Password Change</h3>
+      <h3 class="h3-style">User Password Change</h3>
       <div class="description-contents">
         <p>
           A web page will typically include a link that the user may use to
@@ -211,6 +153,20 @@
         <a href="/changepassword"><button>Change Password</button></a>
         <span>/changepassword will redirect to authorization server.</span>
       </div>
+
+      <h3 class="h3-style">Security Suggestions</h3>
+      <div class="description-contents">
+        <p>
+          The button below will show a page with examples of some 
+          security suggestions that were encountered during this project.
+          These are general suggetsions that are not specific to oauth 2.0.
+        </p>
+      </div>
+
+      <div class="button-div">
+        <a href="/suggestions.html"><button ">Security Suggestions</button></a>
+        <span>Page showing examples</span>
+      </div>      
 
       <div class="footer">
         Collab-frontend demo page.
