@@ -50,9 +50,6 @@ if (nodeEnv === 'production') {
   }
 }
 
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
-
 if (nodeEnv === 'production') {
   app.use(compression());
 }

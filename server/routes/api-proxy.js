@@ -9,31 +9,14 @@ const addAccessToken = require('../auth/add-access-token').addAccessToken;
 const config = require('../config');
 const nodeEnv = process.env.NODE_ENV || 'development';
 
-//
-// For added security, do not expose user's cookie to resource server
-//
-const removeReqCookie = (req, res, next) => {
-  // Remove cookie from HTTP headers in request object
-  // Note: this only removed 1 cookie
-  //
-  if ('cookie' in req.headers) {
-    delete req.headers.cookie;
-  }
-  // remove cookie from raw headers
-  let rawIndex = -1;
-  if (req.rawHeaders.length > 1) {
-    for (let i = 0; i < req.rawHeaders.length; i++) {
-      if (req.rawHeaders[i].toString().toLowerCase() === 'cookie') {
-        rawIndex = i;
-      }
-    }
-  }
-  req.rawHeaders.splice(rawIndex, 2);
-  next();
-};
-
 const proxyOptions = {
-  proxyErrorHandler: function (err, res, next) {
+  proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+    // Remove security sensitive headers.
+    delete proxyReqOpts.headers.cookie;
+    delete proxyReqOpts.headers['csrf-token'];
+    return proxyReqOpts;
+  },
+  proxyErrorHandler: (err, res, next) => {
     // 502 = Bad Gateway
     err.status = 502;
     return next(err);
@@ -42,6 +25,7 @@ const proxyOptions = {
 };
 if (nodeEnv === 'production') {
   proxyOptions.https = true;
+  // TLS certificate host verification
   proxyOptions.rejectUnauthorized = true;
 }
 
@@ -53,7 +37,6 @@ if (nodeEnv === 'production') {
 //
 router.use('/',
   addAccessToken,
-  removeReqCookie,
   proxy(config.remote.apiURL, proxyOptions));
 
 module.exports = router;
