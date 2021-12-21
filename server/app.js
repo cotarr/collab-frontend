@@ -50,8 +50,8 @@ if (nodeEnv === 'production') {
   }
 }
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
 
 if (nodeEnv === 'production') {
   app.use(compression());
@@ -87,7 +87,7 @@ const contentSecurityPolicy = {
     imgSrc: ["'self'"],
     scriptSrc: ["'self'"],
     styleSrc: ["'self'"],
-    formAction: ["'self'"],
+    formAction: ["'none'"],
     frameAncestors: ["'none'"]
   },
   // Option to disable CSP while showing errors in console log.
@@ -307,8 +307,7 @@ const insertCsrfTokenToHtmlPage = function (pageFilename) {
         if (err) {
           return res.status(404).send('Not Found');
         } else {
-          // replace all instances of "{{csrfToken}}" using regular expressions
-          return res.send(data.replace(/\{\{csrfToken\}\}/g, req.csrfToken()));
+          return res.send(data.replace('{{csrfToken}}', req.csrfToken()));
         }
       });
     }
