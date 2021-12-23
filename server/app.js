@@ -84,7 +84,7 @@ const contentSecurityPolicy = {
     imgSrc: ["'self'"],
     scriptSrc: ["'self'"],
     styleSrc: ["'self'"],
-    formAction: ["'none'"],
+    formAction: ["'self'"],
     frameAncestors: ["'none'"]
   },
   // Option to disable CSP while showing errors in console log.
@@ -256,9 +256,32 @@ app.get('/proxy/oauth/introspect',
 );
 
 // -----------------------------------------------------
+// Body Parser
+//
+// Issue: The apiProxy route here uses express-http-proxy.
+//        Express-http-proxy docs require body-parser to be
+//        installed after express-http-proxy.
+//        Csurf middleware requires body-parser to be
+//        installed before csurf to decode the token in body.
+//        This does not apply to node-fetch where token is
+//        sent as a header.
+//
+// -----------------------------------------------------
+// Decode JSON data from body
+app.use(express.json());
+//
+// Decode x-www-form-urlencoded data from body.
+// Submission data from <form> elements can be
+// disabled by removing this parser.
+app.use(express.urlencoded({ extended: false }));
+
+// -----------------------------------------------------
 // Mock REST API
 //
 // The request is checked for a valid user cookie.
+//
+// The auth.check() middleware is used to reject
+// requests that do not have a valid cookie.
 //
 // The request uses csurf middleware to reject
 // requests not having proper csrf token (403 Forbidden).
@@ -304,7 +327,9 @@ const insertCsrfTokenToHtmlPage = function (pageFilename) {
         if (err) {
           return res.status(404).send('Not Found');
         } else {
-          return res.send(data.replace('{{csrfToken}}', req.csrfToken()));
+          // return res.send(data.replace('{{csrfToken}}', req.csrfToken()));
+          // alternate to replace multipe substitutions
+          return res.send(data.replace(/\{\{csrfToken\}\}/g, req.csrfToken()));
         }
       });
     }
@@ -352,6 +377,13 @@ app.use(function (err, req, res, next) {
   let message = http.STATUS_CODES[status] || 'Unknown Error Occurred';
   if ((err.message) && (message !== err.message)) message += ', ' + err.message;
   message = 'Status: ' + status.toString() + ', ' + message;
+
+  // Custom error response for csurf middleware
+  if (err.code === 'EBADCSRFTOKEN') {
+    console.log('Invalid csrf token');
+    return res.status(403).send('Forbidden, invalid csrf token');
+  }
+
   if (nodeEnv === 'production') {
     console.log(message);
     return res.set('Content-Type', 'text/plain').status(status).send(message);

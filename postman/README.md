@@ -40,6 +40,12 @@ for these test.
 - collab-frontend - mock web server
 - collab-backend-api - mock API server
 
+## Rate Limiter Issues
+
+Repeated testing may encounter status 429 (Too Many Requests) 
+from the collab-auth authorization server. 
+The rate limiters may be reset by restarting the authorization server.
+
 ## Collection "collab-frontend"
 
 The authorization method should have been preset after importing the collection.

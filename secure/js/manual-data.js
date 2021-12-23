@@ -47,13 +47,13 @@ const getManualEditData = (endpointUrl) => {
     })
     .then((json) => {
       // console.log(JSON.stringify(json, null, 2));
-      document.getElementById('manualEditText').textContent = JSON.stringify(json, null, 2);
-      document.getElementById('manualEditErrorText').textContent = '';
+      document.getElementById('manualReadText').textContent = JSON.stringify(json, null, 2);
+      document.getElementById('manualReadErrorText').textContent = '';
     })
     .catch((err) => {
       console.log(err);
-      document.getElementById('manualEditText').textContent = '';
-      document.getElementById('manualEditErrorText').textContent = err.message || err.toString();
+      document.getElementById('manualReadText').textContent = '';
+      document.getElementById('manualReadErrorText').textContent = err.message || err.toString();
     });
 }; // getTestApiData()
 
