@@ -7,7 +7,7 @@
     <title>collab-frontend - Suggestions</title>
     <link rel="stylesheet" href="css/styles.css">
     <script src="./js/main.js" defer></script>
-    <script src="./js/manual-data.js" defer></script>
+    <script src="./js/suggestions.js" defer></script>
   </head>
   <body>
     <div class="head-fixed">
@@ -118,7 +118,7 @@
       <div class="vs-20"></div>
       <div class="lm-20">Example using browser JavaScript to read an existing record.</div>
       <div class="button-div">
-        <button id="manualEditButton2">Read Data</button>
+        <button id="getRecordButtonId">Read Data</button>
         <span>GET &quot;/api/v1/data/manual-data/update/435bf533-7280-4dce-a9d0-2960b43019f9&quot;</span>
       </div>
       <div class="info-div" >
@@ -130,8 +130,7 @@
       <div class="lm-20">Example using browser JavaScript to modify an existing record</div>
       <div class="button-div">
         <input type="checkbox" id="csrfHeaderCheckbox" name="csrfHeader" checked />
-        <span>Add Header: &quot;CSRF-Token&quot;</span>
-        <span id="currentCsrfTokenValue"></span>
+        <span>Add Header: CSRF-Token {{csrfToken}}</span>
       </div>
       <div class="button-div">
         <label for="weather">Weather:</label>
@@ -140,7 +139,7 @@
         <span>(Restricted: a-z, A-Z, 0-9, space)</span>
       </div>
       <div class="button-div">
-        <button id="manualEditButton1">Write Data</button>
+        <button id="patchRecordButtonId">Write Data</button>
         <span>PATCH &quot;/api/v1/data/manual-data/435bf533-7280-4dce-a9d0-2960b43019f9&quot;</span>
       </div>
       <div class="info-div" >
@@ -209,11 +208,59 @@
           For this demonstration, the CSP for this page should look something
           similar to the following example:
         </p>
+        <div class="info-div" >
+          Content-Security-Policy: default-src 'none';base-uri 'self';connect-src 'self';
+          img-src 'self';script-src 'self';style-src 'self';form-action 'self';frame-ancestors 'none'
+        </div>
+        <p>
+          Using a Chrome web browser, the operation of the CSP can be verified on this page. 
+          If your are running this demonstration with the default configuration
+          in a development enviornment, the URL of the frontend web server 
+          is a domain name (localhost) compared to the authorization server 
+          that is a numeric IP address (127.0.0.1).
+          From the browsers point of view, these two URL are different <i>origin</i>.
+          The use of JavaScript to fetch data from the authorization 
+          server be considered a <i>Cross-Origin</i> request.
+          The CSP in the browser should block the request and display the message: 
+        <div class="info-div" >
+          Refused to connect to ... because it violates the following 
+          Content Security Policy directive: "connect-src 'self'".
+        </div>
+        <p>
+          Open the developer tools, select the Console tab, and click the [ReadData] button below.
+        </p>
       </div>
 
+      <div class="button-div">
+        <button id="cspTestButtonId">Read Data</button>
+        <span>GET </span>
+        <!-- The authorization server address is configurable in web server -->
+        <!-- The {{xxx}} value will be substituted before download of suggestions.html -->
+        <!-- JavaScript will extract the URL for use in the test -->
+        <span id="cspTestUrlAttr">{{authStatusUrl}}</span>
+        <span> (Auth server status route)</span>
+      </div>
       <div class="info-div" >
-        Content-Security-Policy: default-src 'none';base-uri 'self';connect-src 'self';
-        img-src 'self';script-src 'self';style-src 'self';form-action 'self';frame-ancestors 'none'
+        <pre id="cspTestText"></pre>
+        <div class="error-text" id="cspTestErrorText"></div>
+      </div>
+      <div class="description-contents">
+        <p>
+          It is interesting, if the CSP disabled by temporarily setting connect-src '*', 
+          the browser will fall back to a different policy and continue to 
+          deny the request with the following message:
+        </p>
+        <div class="info-div" >
+          Access to fetch at ... from origin ... has been blocked by CORS policy: 
+          No 'Access-Control-Allow-Origin' header is present on the requested resource. 
+        </div>
+        <p>
+          The idea here is to present awareness these policies exist and 
+          where to look. In this project, they are defined in the collab-frontend 
+          repository in the &quot;app.js&quot; file. However, if you 
+          build a web site, you will need to determine policies specific to your needs.
+          You can search for some youtube tutorials.
+        </p>
       </div>
 
       <h3 class="h3-style">Research Additional Security Practices</h3>

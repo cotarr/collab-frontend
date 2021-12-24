@@ -260,26 +260,32 @@ app.get('/proxy/oauth/introspect',
 //
 // Issue: The apiProxy route here uses express-http-proxy.
 //        Express-http-proxy docs require body-parser to be
-//        installed after express-http-proxy.
+//        defined after express-http-proxy is defined.
 //        Csurf middleware requires body-parser to be
-//        installed before csurf to decode the token in body.
-//        This does not apply to node-fetch where token is
-//        sent as a header.
+//        defined before csurf to decode the urlencoded form request.
+//        It is unclear how to resolve this...
 //
+//        From experiment:
+//        If form submission is not required, both body parser types
+//        can be omitted, and backend will parses it's own JSON data.
+//        To handle form data, parsing urlencoded data without JSON
+//        seems to break the reverse proxy for the JSON case.
+//        Therefore to demonstrate form data both json and urlencoded
+//        body parser types are included. (TODO look into this)
+//
+//        The body parser is not needed when using the fetch API
+//        in the browser, because csrf tokens can be sent as an
+//        html header.
 // -----------------------------------------------------
 // Decode JSON data from body
 app.use(express.json());
-//
 // Decode x-www-form-urlencoded data from body.
-// Submission data from <form> elements can be
-// disabled by removing this parser.
 app.use(express.urlencoded({ extended: false }));
 
 // -----------------------------------------------------
 // Mock REST API
 //
-// The request is checked for a valid user cookie.
-//
+// The request is expected to have a valid user cookie.
 // The auth.check() middleware is used to reject
 // requests that do not have a valid cookie.
 //
@@ -327,9 +333,13 @@ const insertCsrfTokenToHtmlPage = function (pageFilename) {
         if (err) {
           return res.status(404).send('Not Found');
         } else {
-          // return res.send(data.replace('{{csrfToken}}', req.csrfToken()));
-          // alternate to replace multipe substitutions
-          return res.send(data.replace(/\{\{csrfToken\}\}/g, req.csrfToken()));
+          // Render suggestions page
+          // Generate and substitute csrfToken (2 places)
+          // Substutute URL for authorizaton server to demo CSP.
+          return res.send(data
+            .replace(/\{\{csrfToken\}\}/g, req.csrfToken())
+            .replace('{{authStatusUrl}}', config.oauth2.authURL + '/status')
+          );
         }
       });
     }

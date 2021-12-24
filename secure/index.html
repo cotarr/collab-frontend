@@ -26,7 +26,7 @@
     <div class="scrollable-div">
 
       <div class="center">
-        <img class="image" src="images/home-network-oauth2.png" alt="home network oauth2 network" width="1130" height="612">
+        <img class="image" src="images/home-network-oauth2.png" alt="home network oauth2 network" width="80%" height="80%">
       </div>
 
       <h3 class="h3-style">Overview</h3>
@@ -49,7 +49,7 @@
           backend API server shown on the right.
         </p>
         <div class="center">
-          <img class="image" src="images/cookie-to-token.png" alt="Exchange cookie for access token" width="902" height="214">
+          <img class="image" src="images/cookie-to-token.png" alt="Exchange cookie for access token" width="75%" height="75%">
         </div>
       </div>
 
@@ -69,9 +69,12 @@
         <p>
           If the mock database is running (collab-backend-api), pressing this
           [Fetch Data] button will generate an API query request.
-          The web server will add the users access token.
-          If the token is successfully validated by the mock API,
-          then the API will return an array and it will be displayed.
+          The frontend web server will receive the request, validate the user's cookie,
+          then retrieve an oauth 2.0 access token that was stored on the user's behalf.
+          The web server will add the users access token and pass the request 
+          to the backend API server.
+          If the token is successfully validated, then the backend API will 
+          return an array in JSON format and it will be displayed.
         </p>
         <p>
           If the mock IOT device is also running (collab-iot-device),
