@@ -10,17 +10,17 @@
 //
 // ---------------------------------------------------
 
-// --------------------------
-//  Internal fetch function
-// --------------------------
-const getTestApiData = (endpointUrl) => {
-  const fetchUrl = endpointUrl;
+// ---------------------------------------------
+// Event handlers for buttons, mock API requests
+// ---------------------------------------------
+document.getElementById('iotDataButton').addEventListener('click', () => {
   const fetchOptions = {
     method: 'GET',
     headers: {
       Accept: 'application/json'
     }
   };
+  const fetchUrl = '/api/v1/data/iot-data/';
   fetch(fetchUrl, fetchOptions)
     .then((response) => {
       if (response.ok) {
@@ -53,40 +53,4 @@ const getTestApiData = (endpointUrl) => {
       document.getElementById('apiDataText').textContent = '';
       document.getElementById('apiErrorText').textContent = err.message || err.toString();
     });
-}; // getTestApiData()
-
-// ---------------------------------------------
-// Event handlers for buttons, mock API requests
-// ---------------------------------------------
-document.getElementById('iotDataButton').addEventListener('click', () => {
-  getTestApiData('/api/v1/data/iot-data/');
 });
-
-// --------------------------------------------------
-// Button click handler, check login status
-// --------------------------------------------------
-document.getElementById('userinfoButton').addEventListener('click', () => {
-  // --------------------------------------------------------
-  // Callback function to show response data or error on page
-  // --------------------------------------------------------
-  const callback = (err, data) => {
-    if (err) {
-      document.getElementById('userinfoText').textContent = '';
-      document.getElementById('userinfoErrorText').textContent = err.message;
-    } else {
-      document.getElementById('userinfoText').textContent = JSON.stringify(data, null, 2);
-      document.getElementById('userinfoErrorText').textContent = '';
-    }
-  };
-  fetchUserInfo(callback);
-});
-document.getElementById('clearUserinfoButton').addEventListener('click', () => {
-  document.getElementById('userinfoText').textContent = '';
-  document.getElementById('userinfoErrorText').textContent = '';
-});
-
-document.getElementById('clearDisplayButton').addEventListener('click', () => {
-  document.getElementById('apiDataText').textContent = '';
-  document.getElementById('apiErrorText').textContent = '';
-});
-

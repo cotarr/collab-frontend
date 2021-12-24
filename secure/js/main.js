@@ -2,64 +2,48 @@
 //
 // Demo web site - JavaScript controller
 //
-//  Automatic redirect to authorization server for user login
-//     This is accomplished by traping errors retrieving user information.
-//      Alternately, the user's name is displayed in the banner.
+// This is common JavaScript that is loaded
+// into all the pages to handler the header.
 //
-// -------------------------------------------------
-// Fetch user information from authorization server
-// -------------------------------------------------
-const fetchUserInfo = (callback) => {
-  const fetchUrl = '/userinfo';
-  const fetchOptions = {
-    method: 'GET',
-    timeout: 5000,
-    headers: {
-      Accept: 'application/json'
-    }
-  };
-  fetch(fetchUrl, fetchOptions)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error('Fetch status ' + response.status + ' ' +
-          fetchOptions.method + ' ' + fetchUrl);
-      }
-    })
-    .then((json) => {
-      // console.log(JSON.stringify(json, null, 2));
-      callback(null, json);
-    })
-    .catch((err) => {
-      console.log(err);
-      callback(err);
-    });
-}; // showLoginStatus()
-
-// ---------------------------------------------------
-// Callback function to update page header with username
-//
-// Unauthorized users will be redirected to
-// a landing page with a login button.
-// ---------------------------------------------------
-const loadCallback = (err, data) => {
-  if (err) {
-    document.getElementById('headerName').textContent = '';
-    window.location = '/unauthorized';
-  } else if ((data) && ('name' in data)) {
-    document.getElementById('headerName').textContent = data.name;
-  } else {
-    document.getElementById('headerName').textContent = '';
-    window.location = '/unauthorized';
-  }
-}; // loadCallback()
 
 // --------------------------
 // Event handler for page load
 // --------------------------
 window.onload = (event) => {
+  // -------------------------------------------------
+  // Fetch header bar with user information from
+  // authorization server /userinfo route.
+  // Returns promise
+  // -------------------------------------------------
   setTimeout(() => {
-    fetchUserInfo(loadCallback);
+    const fetchUrl = '/userinfo';
+    const fetchOptions = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json'
+      }
+    };
+    fetch(fetchUrl, fetchOptions)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Fetch status ' + response.status + ' ' +
+            fetchOptions.method + ' ' + fetchUrl);
+        }
+      })
+      .then((data) => {
+        if ((data) && ('name' in data)) {
+          document.getElementById('headerName').textContent = data.name;
+        } else {
+          document.getElementById('headerName').textContent = '';
+          window.location = '/unauthorized';
+        }
+      })
+      .catch((err) => {
+        console.log(err.message || err);
+        document.getElementById('headerName').textContent = '';
+        window.location = '/unauthorized';
+      });
   }, 250);
 };

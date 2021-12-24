@@ -1,13 +1,12 @@
 'use strict';
 
-// -------------------
-// Internal function
-// -------------------
-const fetchTokenInfo = (callback) => {
+// --------------------------------------------
+// Button event handler for introspect call
+// --------------------------------------------
+document.getElementById('introspectButton').addEventListener('click', () => {
   const fetchUrl = '/proxy/oauth/introspect';
   const fetchOptions = {
     method: 'GET',
-    timeout: 5000,
     headers: {
       Accept: 'application/json'
     }
@@ -28,54 +27,61 @@ const fetchTokenInfo = (callback) => {
         throw new Error(errorString);
       }
     })
-    .then((json) => {
+    .then((jsonData) => {
       // console.log(JSON.stringify(json, null, 2));
-      callback(null, json);
+      document.getElementById('introspectText').textContent = JSON.stringify(jsonData, null, 2);
+      document.getElementById('introspectErrorText').textContent = '';
     })
     .catch((err) => {
       console.log(err);
-      callback(err);
-    });
-}; // showLoginStatus()
-
-// --------------------------------------------
-// Button event handler for introspect call
-// --------------------------------------------
-document.getElementById('introspectButton').addEventListener('click', () => {
-  const callback = (err, data) => {
-    if (err) {
       document.getElementById('introspectText').textContent = '';
       document.getElementById('introspectErrorText').textContent = err.message;
-    } else {
-      document.getElementById('introspectText').textContent = JSON.stringify(data, null, 2);
-      document.getElementById('introspectErrorText').textContent = '';
-    }
-  };
-  fetchTokenInfo(callback);
+    });
 });
+
+// -----------------------------------
+// Button handler to clear display data
+// -----------------------------------
 document.getElementById('clearIntrospectButton').addEventListener('click', () => {
   document.getElementById('introspectText').textContent = '';
   document.getElementById('introspectErrorText').textContent = '';
 });
 
 // --------------------------------------------------
-// Button click handler, check login status
+// Button click handler, show user info
 // --------------------------------------------------
 document.getElementById('userinfoButton').addEventListener('click', () => {
-  // --------------------------------------------------------
-  // Callback function to show response data or error on page
-  // --------------------------------------------------------
-  const callback = (err, data) => {
-    if (err) {
-      document.getElementById('userinfoText').textContent = '';
-      document.getElementById('userinfoErrorText').textContent = err.message;
-    } else {
-      document.getElementById('userinfoText').textContent = JSON.stringify(data, null, 2);
-      document.getElementById('userinfoErrorText').textContent = '';
+  const fetchUrl = '/userinfo';
+  const fetchOptions = {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json'
     }
   };
-  fetchUserInfo(callback);
+  fetch(fetchUrl, fetchOptions)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Fetch status ' + response.status + ' ' +
+          fetchOptions.method + ' ' + fetchUrl);
+      }
+    })
+    .then((jsonData) => {
+      // console.log(JSON.stringify(json, null, 2));
+      document.getElementById('userinfoText').textContent = JSON.stringify(jsonData, null, 2);
+      document.getElementById('userinfoErrorText').textContent = '';
+    })
+    .catch((err) => {
+      console.log(err);
+      document.getElementById('userinfoText').textContent = '';
+      document.getElementById('userinfoErrorText').textContent = err.message;
+    });
 });
+
+// -----------------------------------
+// Button handler to clear display data
+// -----------------------------------
 document.getElementById('clearUserinfoButton').addEventListener('click', () => {
   document.getElementById('userinfoText').textContent = '';
   document.getElementById('userinfoErrorText').textContent = '';
