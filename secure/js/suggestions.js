@@ -1,6 +1,6 @@
 'use strict';
 //
-// The functions below are used in the submissions.html page
+// The functions below are used in the suggestions.html page
 //
 // 1) Demonstrate input sanitization.
 // 2) Demonstrate use of csrf tokens

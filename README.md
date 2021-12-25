@@ -35,7 +35,7 @@ npm install
 
 In the development environment with NODE_ENV=development or NODE_ENV not specified,
 the application should run as-is. No configuration is necessary in development mode.
-Alternately, environment variables can be configured as listed at the end of this README.
+Alternately, environment variables can be configured as listed in this README.
 In the default configuration the server will listen on port 3000 at http://localhost:3000.
 
 ```bash
@@ -52,10 +52,13 @@ Static Content:
 
 This is intended to emulate a private web site. All files on this website are access restricted.
 No website files will load until the user successfully provides a username and password.
-Any unauthorized attempt to view the page will redirect the browser to the
-oauth2 authorization server. After successful entry of username and password,
-the browser will be automatically redirected back to the original web site with an authorization code.
-This web server will submit the authorization code to the authorization server and
+Any unauthorized attempt to view the page will redirect the browser to an
+unauthorized landing page with a user login button.
+Clicking the [login] button on the landing page will send the web browser to a local /login 
+route which will redirect the browser (302) to the authorizaton server.
+After successful entry of username and password, the authorization server will redirect
+the browser back to the original web site with an authorization code.
+This web server will then submit the authorization code to the authorization server and
 a valid oauth access token will be returned to the web server where the token is
 stored on behalf of the user. The user's session is marked as authorized.
 All further requests to download static content will confirm the user's authorized status
@@ -66,7 +69,7 @@ API Access:
 It is assumed the mock REST API and the mock IOT device haave been started
 and mock data is being submitted to the database,
 
-* The web browser will use it's stored cookie to access the proper route on the web server.
+* The web browser will use it's stored cookie to access the API route on the web server.
 * The web server will append a copy of the user oauth2 access token to the HTTP request.
 * The web server will forward the request through a reverse proxy to the mock database API.
 * The web server uses "/api" as the route prefix for the reverse proxy.
@@ -75,7 +78,7 @@ and mock data is being submitted to the database,
 * The database API at "http://localhost:4000/v1/data/iot-data/" checks the access_token and honors the request.
 
 It is not possible to directly access the API on port 4000 using the browser address bar
-because the browser does not have an access_token.
+because the browser does not have an valid oauth access_token.
 
 If the database is running and contains mock data, records can be viewed using a button on the page.
 The data consists of an array of objects in JSON format. If the array is empty, it will be
@@ -102,8 +105,8 @@ token validation results for the currently stored user access_token. This functi
 normally available to the user. It is used by resource servers, such as the database API,
 to confirm validity of a user's token before honoring the HTTP request.
 
-Note that the token's scope is limited to "api.read" due to the user role "api.read"
-in the user account record, so this user can read but not write to this table in the database.
+Note that the token's scope is set to "api.write" due to the user role "api.write"
+in the user account record, so this user can both read and write to this table in the database.
 
 To consider the token to be valid, the application should check for both status 200 in the
 http request and the property `active === true` in the body of the response.
@@ -162,16 +165,14 @@ There are three scope value that are relevant to this example:
 * The web server token request scope used as a "scope" query parameter.
 
 The user role and client allowedScope are set in the authorization server.
-The only scope relevant to this web server module is the token request scope.
-The default value is `'["api.read", "api.write"]')`.
-This can be customized using the OAUTH2_REQUESTED_SCOPE environment variable
+The request scope is hard coded into the frontend web server.
 
 * The web server's client account allowedScope "auth.token" is an auth server permission to allow token issuance on behalf of authenticated users.
 * The web server's client account allowedScope "api.read" and "api-write" are possible permissions of tokens issued using the client's ID.
-* The user's account role requires "api.read" to control permissions of tokens using the user's ID.
-* The token request scope "api.read" and "api.write" relate to capabilities of the server software reverse proxy.
+* The user's account role has set "api.write" to control permissions of tokens using the user's ID.
+* The token request scope "api.read" and "api.write" can limit the capabilities of the web server to use different proxy or backend connections.
 
-The scope of the access token is the intersection of all three scopes. The desired scope my be present in all three. In this case, tokens issued on behalf of the user will have scope intersection of "api.read". Any requests to the backend API must have a valid token and the token must include scope "api.read" or the request will be rejected.
+The scope of the access token is the intersection of all three scopes. The desired scope must be present in all three. In this case, tokens issued on behalf of the user will have scope intersection of "api.write". Any requests to the backend API must have a valid token and the token must include scope "api.read" or "api.write" or the request will be rejected.
 Invalid tokens will reject with status 401 Authorized. Insufficient scope will reject with status 403 Forbidden.
 
 ### Example Environment variables
@@ -192,8 +193,8 @@ SERVER_PID_FILENAME=
 SESSION_SET_ROLLING_COOKIE=false
 SESSION_SET_SESSION_COOKIE=false
 SESSION_EXPIRE_SEC=604800
-SESSION_SECRET="Change Me"
 SESSION_PRUNE_INTERVAL_SEC=86400
+SESSION_SECRET="Change Me"
 SESSION_ENABLE_REDIS=false
 SESSION_REDIS_PREFIX="session:"
 SESSION_REDIS_PASSWORD=""
@@ -207,79 +208,176 @@ OAUTH2_REQUESTED_SCOPE='["api.read","api.write"]'
 REMOTE_API_URL=http://localhost:4000
 ```
 
-### Replacing expired user cookie
+Not supported in .env file
+
+```
+# When NODE_ENV=production, console activity log disabled.
+NODE_ENV=development
+# When NODE_DEBUG_LOG=1, console activity log enabled when in production
+NODE_DEBUG_LOG=0
+```
+
+### Detecting expired user cookie
 
 In this demonstration, expired cookies can be updated by refreshing the page.
 
 Access to the static files such as HTML, CSS and JS are authorized by
-the user's cookie that is stored on the web server.
-Validation of the cookie is performed by the web server by
-comparing the cookie ID to a value stored in the users session.
+the user's cookie that is stored on the collab-frontend web server.
+Validation of the cookie is performed by a check() funciton in the web server 
+using information stored in the user's session.
 
-When the web server detects an expired cookie, a redirect (302) to /login
-is returned to the web browser. This initiates the oauth workflow
+When the web server detects an expired cookie, a redirect (302) to /unauthorized
+is returned to the web browser. This sends the web browser to an unauthorized
+landing page with a [login] button. The login button will
+access a local /login route that will redirect (302) the browser the oauth workflow
 by sending the browser to /dialog/authorize path on the authorization server.
 
-The user's browser can store two cookies, one for the web page, and a
-second cookie for the authorization server login page.
-In the case where the web page cookie is expired or deleted
-the authorization server redirect can be handled in two different ways.
-If the user's second cookie for the authorization server is still valid,
-the request to the /dialog/authorize path will immediately return
-a new authorization code without prompting for a password.
-In the case where both cookies are expired, password entry is required.
+The request to the /dialog/authorize path on the collab-auth authoriztion server 
+will initiate a password entry workflow. Upon successful verification of the 
+user's identity by password entry, the authorization server will redirect (302)
+the browser back to the collab-frontend web server including an authorization 
+code as a query parameter in the redirect URL. Independently from the 
+browser, the web server will contact the authorization server directly, and exchange
+the authorization code for an access token. After the web server has obtained 
+a valid access token, the user's session is marked as authorized.
+Future downloads will succeed without error. 
 
-After the web server has completed the oauth handshake process,
-the user's session is marked as authorized and future downloads
-will succeed without error. Thus, refreshing the page will renew
-an expired cookie.
+Thus, refreshing the page will initiate actions necessary to refresh the cookie, if needed.
 
-In this example, the login redirect will always redirect the browser
-to the main home page. It is possible for the web server to remember
+In this example, a successful login will redirect the browser
+to the main home page (index.html). It is also possible for the web server to remember
 the initial request path, such as /page3.html or /index.html.
-The path of the original request can be stored in the user's session
-to restore the original request URL after password entry.
+The path of the original request can be stored in the user's session.
+After password entry, the original request URL can be restored as the page address.
 Passport supports this using the successReturnToOrRedirect option.
 This has not been implemented in this demonstration.
 
-### Replacing expired access tokens
+### Detecting expired access tokens
 
-In the case of the default configuration, expired access tokens may
-be replaced by refreshing the page. This works as follows:
-
-Expired tokens can be detected on the main web page.
-Third party database requests pass through the web server using a reverse proxy.
-The web server appends the access token to all reverse proxy server requests.
-The web server appends the token without validation of token status.
-Validation is performed by the mock REST API also known as resource server.
-In the case where the access token is expired, the API reverse proxy
-request will return an error to the browser.
-When viewing the main web page, activating the API display button will
-show an error on the web page due to the expired token.
+Expired access tokens may also be replaced by refreshing the page. This works as follows:
 
 In the previous section, an expired cookie was detected by the web server.
 In the case of API calls, the expired token is detected locally in the user web browser
 by monitoring the response to the /userinfo request.
 
-The web page contains a header bar at the top. The page contains javascript code that
-performs a GET request to the /userinfo route on the web server.
+The web page contains a header bar at the top with a place to display the user's name. 
+When the page loads, browser JavaScript performs a GET request to 
+the /userinfo route on the web server.
 The web server will in turn submit the user's access token to the authorization
 server /oauth/introspect route. The user's metadata is returned to the web server.
-The user real name is extracted and returned to the web browser.
+The user real name is extracted and returned to the web browser's /userinfo request.
 The page header is then updated with the user's real name.
+
 In the event where the /userinfo GET request fails with an error,
-the browser will execute javascript code to set window.location to /login.
-This will initiate an oauth workflow as described above and a replacement
+the browser will execute JavaScript code to set window.location to /unauthorized.
+This sends the web browser to an unauthorized landing page with a [login] button.
+Clicking the login button will initiate an oauth workflow as described above and a replacement
 access token is obtained.
 
-In the case where the user's web browser has a valid cookie for the
-authorization server login page, the password form is not required.
-The oauth redirects are immediate.
-To the user, refreshing the page restores access to the API.
+Within the frontend web server, the access token and the token expiration
+time are stored in the user's session. The web server check() function will
+first compare the access token expiration time to the current system clock.
+If the token has expired, the API call will fail (401) which initiates the 
+browser redirects described above.
 
-In the case where where the users cookie for the authorization server is
-expired, a password form will be presented to the user as part of the workflow.
+Assuming the access token is not expired, the access token is used by the web
+server when the request is forwarded through the reverse proxy to the 
+backend API server. If the backend API server fails to successfully validate 
+the access token, the API call will fail (401) which initiates the browser
+redirects described above.
 
-In summary, by properly managing the expiration time of the cookies and tokens
-persistent login can be maintained. New tokens are replaced automatically
-during page load or page refresh as needed.
+### Refresh Tokens
+
+This project can be configured to use Oauth 2.0 refresh tokens.
+A refresh token can be thought of as a temporary password that can be used
+by the web server to obtain replacement access tokens from the authorization server.
+Therefore, there are now to methods to for the web server to get an access token.
+One way is using the authorization code obtained after user password entry.
+The second way is by submitting a refresh token to the authorization server
+to request a replacement access token.
+
+In the case where the users access token is expired or otherwise invalid,
+the frontend web server will look for a non-expired refresh token.
+If found, the web server will submit the refesh token directly to the
+authorization server at the /oauth/token route.
+The authorization server will verify the refresh token signature and status.
+If the refresh token is valid, the authorization server will return a new access token
+to the web server with the same scope and user information as the original access token.
+The web server will then continue to handle the pending API call using
+the replacement access token. In terms of the user experience,
+the token replacement is invisible and the page appears to function normally.
+
+In the case where both the access token and the refresh token are expired,
+the web server will redirect (302) the web browser to the /unauthorized
+landing page. Selection of the login button by the user will return
+the web browser to the authorization server for password entry.
+Remainder of the login workflow is equivalent to operation without
+refresh tokens as described above.
+
+If refresh tokens are enabled on the collab-auth server,
+user password entry followed by submission of the access code to the authorization
+server will return two tokens in the same reqeust, an access_token and refresh_token.
+Both are stored on the user's behalf in the user's session.
+
+Refresh Token Configuration:
+
+There is no configuration necessary in the
+collab-frontend web server. When a response from a token request to /oauth/token 
+includes a refresh token, it will be stored for use in the user's session.
+Refresh tokens must be enabled in the collab-auth authorization server configuration.
+By default, refresh tokens are enabled in the default configuration for
+demonstration in a protected development environment.
+
+In the collab-auth frontend web server, handing of the access token expiration 
+can be set on a per-route basis by passing an options object
+to the collab-frontend check() function. If `ignoreToken` is set to true, the 
+request will use only the cookie, and honor the request, even if the token
+is expired. If `disableRefresh` is set to true, an expired access token
+fail without attempting to use the refresh token. 
+
+```js
+const auth = require('./auth/auth-check');
+const options = {
+  redirectURL: '/unauthorized',
+  ignoreToken: false,
+  disableRefresh: false,
+}
+app.get('/some-route',
+  auth.check(options),
+  (req, res, next) {
+    res.send('hello world);
+  }
+);
+```
+
+Custom Code:
+
+The passport strategy passport-oauth2 does not include implementation
+of automatic token replacement of access tokens using refresh tokens.
+In the case of the collab-frontend web server, the original oauth2
+workflow involving user password entry, authorization code, and access token
+is handled by the passport-oauth2 strategy as configured in the
+`server/auth/passport-config.js` file. For compatibililty with 
+refresh tokens, the passport callback function will extract 
+the access token expiration time and store it in the session 
+so it can be used independently to handle refresh tokens.
+
+In order learn about refresh tokens and demonstrate their use, 
+a simple JavaScript fetch function was written and included
+into the check function of the `auth-check.js` file. 
+As a middleware, the check function will then check the token expiration time
+that was previously stored in the user's session and fetch a replacement 
+token if needed before calling next() on the check middleware.
+
+Disclaimer: Code used in the check function to obtain replacement access tokens
+was written for this demo. The code has not been robustly tested.
+
+# Example Security Suggestions
+
+During the course of this project, several security suggestions 
+were discovered. Although not part of Oauth 2.0 specifically, 
+security weaknesses can compromise sites that use oauth.
+The collab-frontend contains a second page at /suggestions.html 
+where an example of input sanitization, csrf tokens, and 
+content security policy were tried. The examples are explained 
+on the page. You may find them intersting.
