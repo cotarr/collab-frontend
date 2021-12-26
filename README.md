@@ -85,7 +85,7 @@ The data consists of an array of objects in JSON format. If the array is empty, 
 displayed as `[ ]`. The array is limited to a maximum of 10 elements, and the most recent 10
 timestamped data points from the mock IOT device should be available in the array.
 
-```
+```json
 [
   {
     "id": 1277,
@@ -111,7 +111,7 @@ in the user account record, so this user can both read and write to this table i
 To consider the token to be valid, the application should check for both status 200 in the
 http request and the property `active === true` in the body of the response.
 
-```
+```json
 {
   "active": true,
   "revocable": true,
@@ -144,7 +144,7 @@ There is a button that can be used to view user account information for the
 currently logged in user. This is intended for internal use by the browser JavaScript to
 display the user's name in the header bar or other location.
 
-```
+```json
 {
   "id": "a7b06a6d-7538-45c8-bb5f-b107a8258c7d",
   "number": 1,

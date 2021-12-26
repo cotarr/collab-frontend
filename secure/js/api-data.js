@@ -54,3 +54,11 @@ document.getElementById('iotDataButton').addEventListener('click', () => {
       document.getElementById('apiErrorText').textContent = err.message || err.toString();
     });
 });
+
+// -----------------------------------
+// Button handler to clear display data
+// -----------------------------------
+document.getElementById('clearDisplayButton').addEventListener('click', () => {
+  document.getElementById('apiDataText').textContent = '';
+  document.getElementById('apiErrorText').textContent = '';
+});
