@@ -6,10 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Untagged - 2021-12-29
+## [v0.0.2](https://github.com/cotarr/collab-frontend/releases/tag/v0.0.2) - 2022-01-05
 
 ### Changed
-
+- Update comments in javascript files (no code changes)
+- Passport update minor version
+- Helmet version 4 to version 5
 - Update postman collection 2021-12-28
 - Added github CodeQL scanning 2021-12-29
 
