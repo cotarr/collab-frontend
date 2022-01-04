@@ -19,9 +19,9 @@ const logoutStyles = fs.readFileSync('./server/fragments/logout.css', 'utf8');
 
 const config = require('../config');
 
-/**
- * Local server logout route handler, use passport logout() method to clear user from session
- */
+//
+// HTML fragment
+//
 const logoutHtml =
   logout1Html +
   'Logout successful for the web server at ' +
@@ -33,11 +33,18 @@ const logoutHtml =
   ' ' +
   '<a href="' + config.oauth2.authURL + '/logout"><button>Auth Logout</button></a>' +
   logout2Html;
+
+/**
+ * Local server /logout route handler
+ */
 exports.logout = (req, res, next) => {
   req.logout();
   res.send(logoutHtml);
 };
 
+/**
+ * Local server /styles.css route handler
+ */
 exports.logoutServeCss = (req, res, next) => {
   res.set('Content-Type', 'text/css').send(logoutStyles);
 };

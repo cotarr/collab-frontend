@@ -30,12 +30,16 @@ const config = require('../config');
 // --------------------------------------
 
 //
-// Renew access token if time remaining is leass than this value.
+// Renew access token if time remaining is less than this value.
 //
 const renewWindowSec = 10;
-//
-// Authorizaiton Middleware
-//
+
+/**
+ * Authorization middleware
+ * @param {Object} options
+ * @property {boolean} options.ignoreToken - Authorize using cookie/session, ignoring token
+ * @property {string} options.redirectURL - URL saved in session for restoration after redirect
+ */
 exports.check = (options) => {
   const _options = options || {};
 

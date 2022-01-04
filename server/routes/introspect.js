@@ -7,6 +7,11 @@ const getAccessToken = require('../auth/add-access-token').getAccessToken;
 const config = require('../config');
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
+/**
+ * Send access token to authorization server for validation and meta-data lookup.
+ * @param {Object} req - Express request object
+ * @param {Function} callback - Callback returns introspect data or error
+ */
 const fetchIntrospect = (req, callback) => {
   const accessToken = getAccessToken(req);
   if (accessToken) {
@@ -58,6 +63,9 @@ const fetchIntrospect = (req, callback) => {
   }
 };
 
+/**
+ * Middleware function to send response with token meta-data, or send error
+ */
 const user = (req, res, next) => {
   fetchIntrospect(req, (err, data) => {
     if (err) {
@@ -84,6 +92,9 @@ const user = (req, res, next) => {
   });
 };
 
+/**
+ * Middleware funciton to send response with user data, or send error
+ */
 const introspect = (req, res, next) => {
   fetchIntrospect(req, (err, data) => {
     if (err) {

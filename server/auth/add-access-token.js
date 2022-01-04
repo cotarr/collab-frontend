@@ -16,7 +16,7 @@ exports.addAccessToken = (req, res, next) => {
 
 /**
  * Extract OAuth2 access-token from request header
- * @param   {Object} Express request object
+ * @param   {Object} req - Express request object
  * @returns {String} Returns access_token or undefined
  */
 exports.getAccessToken = (req) => {
