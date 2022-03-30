@@ -1,6 +1,6 @@
 {
   "name": "collab-frontend",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Demo web server used on a collaboration project for learning oauth2orize and passport",
   "main": "bin/www",
   "scripts": {
