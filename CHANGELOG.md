@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Changed
+
+- package.json - Update connect-redis@6.1.3, dotenv@16.0.0, express@4.17.3, --save helmet@5.0.2, memorystore@1.6.7 (No code changes)
+
 ## [v0.0.4](https://github.com/cotarr/collab-frontend/releases/tag/v0.0.4) - 2022-03-30
 
 ### Changed
