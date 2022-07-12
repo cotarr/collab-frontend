@@ -38,8 +38,14 @@ const logoutHtml =
  * Local server /logout route handler
  */
 exports.logout = (req, res, next) => {
-  req.logout();
-  res.send(logoutHtml);
+  // callback function added to support passport v0.6.0 upgrade
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    } else {
+      res.send(logoutHtml);
+    }
+  });
 };
 
 /**

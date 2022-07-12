@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2022-07-12
+
+### Changed
+
+- package.json - Bumped passport from v0.5.2 to v0.6.0 to address github dependabot security advisory realted to session fixation attack.
+- server/auth/logout.js - Added callback function to req.logout() to support required breaking change in passport v0.6.0
+
+### Changed
+- Update express 4.17.3 to 4.18.1, express-session from 1.17.2 to 1.17.3, dotenv from 16.0.0 to 16.0.1, helmet 5.0.2 to 5.1.0
+
 ## [v0.0.5](https://github.com/cotarr/collab-frontend/releases/tag/v0.0.5) - 2022-03-31
 
 ### Changed
