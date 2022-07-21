@@ -80,7 +80,8 @@ const contentSecurityPolicy = {
   directives: {
     defaultSrc: ["'none'"],
     baseUri: ["'self'"],
-    connectSrc: ["'self'"],
+    // connectSrc: ["'self'"],
+    connectSrc: ["'self'", config.remote.apiURL],
     imgSrc: ["'self'"],
     scriptSrc: ["'self'"],
     styleSrc: ["'self'"],
@@ -329,31 +330,52 @@ const secureDir = path.join(__dirname, '../secure');
 // Csurf middleware will insert a req.csrfToken() function
 // into the req object to generate new tokens.
 // ----------------------------------------------------
-const insertCsrfTokenToHtmlPage = function (pageFilename) {
+const InsertCsrfTokenAndUrl = function (pageFilename) {
   return [
     auth.check({ redirectURL: '/unauthorized' }),
     csrfProtection,
     function (req, res, next) {
-      return fs.readFile(secureDir + pageFilename, 'utf8', function (err, data) {
+      // console.log(secureDir + '/' + pageFilename);
+      return fs.readFile(secureDir + '/' + pageFilename, 'utf8', function (err, data) {
         if (err) {
           return res.status(404).send('Not Found');
         } else {
           // Render suggestions page
           // Generate and substitute csrfToken (2 places)
           // Substutute URL for authorizaton server to demo CSP.
-          return res.send(data
-            .replace(/\{\{csrfToken\}\}/g, req.csrfToken())
-            .replace('{{authStatusUrl}}', config.oauth2.authURL + '/status')
-          );
+          if (pageFilename === 'suggestions.html') {
+            return res.send(data
+              .replace(/\{\{csrfToken\}\}/g, req.csrfToken())
+              .replace('{{authStatusUrl}}', config.oauth2.authURL + '/status')
+            );
+          } else if (pageFilename === 'cors-demo.html') {
+            return res.send(data
+              .replace(/\{\{csrfToken\}\}/g, req.csrfToken())
+              .replace('{{authStatusUrl}}', config.oauth2.authURL + '/status')
+              .replace('{{apiStatusUrl}}', config.remote.apiURL + '/status')
+              .replace('{{apiCors2aUrl}}', config.remote.apiURL + '/corsFromAny')
+              .replace('{{apiCors2bUrl}}', config.remote.apiURL + '/corsFromAny')
+              .replace('{{apiCors3aUrl}}', config.remote.apiURL + '/corsFromOne')
+              .replace('{{apiCors3bUrl}}', config.remote.apiURL + '/corsFromOne')
+            );
+          } else {
+            return res.send(data
+              .replace(/\{\{csrfToken\}\}/g, req.csrfToken())
+            );
+          }
         }
       });
     }
   ];
 };
+
 // ------------------------------------------------
 // Pages to be rendered with CSRF token inserted.
 // ------------------------------------------------
-app.get('/suggestions.html', insertCsrfTokenToHtmlPage('/suggestions.html'));
+app.get('/suggestions.html', InsertCsrfTokenAndUrl('suggestions.html'));
+app.get('/cors-demo.html', InsertCsrfTokenAndUrl('cors-demo.html'));
+app.get('/index.html', InsertCsrfTokenAndUrl('index.html'));
+app.get('/', InsertCsrfTokenAndUrl('index.html'));
 
 // -------------------------------
 // Web server for static files

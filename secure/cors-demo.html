@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="csrf-token" content="{{csrfToken}}">
+    <title>collab-frontend - Cors Demo</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="./js/main.js" defer></script>
+    <script src="./js/cors-demo.js" defer></script>
+  </head>
+  <body>
+    <div class="head-fixed">
+      <div class="head-flex">
+        <div class="head-left header-font">
+          <a href="/"><button>Home</button></a>
+          Cors Demo
+        </div>
+        <div class="head-right">
+          <span id="headerName"></span>
+          <a href="/logout"><button>Logout</button></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="scrollable-div">
+
+      <h3 class="h3-style">Cross-Origin Resource Sharing (CORS)</h3>
+      <div class="description-contents">
+        <p>
+          This an unrelated CORS demo. CORS would not applicable to backend requests because
+          the frontend web server uses a proxy server forward API requests.
+          Therefore the API URL and Web server URL would comply with browser Same Origin Policy.
+        <p>
+          CORS can not be directly demonstrated here because any browser request to the
+          backend API would be missing an access_token, and fail with 401 Unauthorized.
+          Therefore, in order to demonstrate CORS, test routes /corsFromAny and /corsFromOne 
+          were created and do not require authentication.
+        </p>
+        <p>
+          The frontend web server Content Security Policy CSP 'connect-src' 
+          is set to the URL of the backend API server. You can see this in the 
+          response headers for this page (suggestions.html).
+        </p>
+        <p>
+          An environment variable SITE_FRONTEND_CORS_HOST was added to the collab-backend-api
+          in order to specify an allow address for the CORS demonstration.
+        </p>
+        <p>
+          The following buttons are cross-origin examples using CORS.
+        </p>
+        <ul>
+          <li>(fail) GET /status - Example: Browser Content Security Policy (CSP) rejects request due missing &quot;connect-src&quot;.</li>
+          <li>(fail) GET /status - Example: Browser Same Origin Policy (SOP) rejects request due to missing Access-Control-Allow-Origin header.</li>
+          <li>(OK) GET /corsFromAll - Example: Access-Control-Allow-Origin returns '*' for all routes (* like CDN).</li>
+          <li>(OK) DELETE /corsFromAll - Example: (Pre-flight) using OPTIONS request( *like CDN).</li>
+          <li>(OK) GET /corsFromOne - Example: Access-Control-Allow-Origin response header with allowed host.</li>
+          <li>(OK) DELETE /corsFromOne - Example: (Pre-flight) using OPTIONS request</li>
+        </ul> 
+        <p>
+          The browser network tab will show the Pre-flight requests.
+        </p>
+      </div>
+
+      <!-- CSP failure -->
+      <div class="button-div">
+        <button id="corsCspTestButtonId">Read Data</button>
+        <span>GET </span>
+        <span id="corsCspTestUrlAttr">{{authStatusUrl}}</span>
+        <span> (Browser blocked: Content Security Policy CSP &quot;connect-src&quot; not include URL)</span>
+      </div>
+
+      <!-- CORS failure -->
+      <div class="button-div">
+        <button id="corsTest1ButtonId">Read Data</button>
+        <span>GET </span>
+        <span id="corsTestUrl1Attr">{{apiStatusUrl}}</span>
+        <span> (Browser Blocked: Common Origin Policy (CORS) failed, and no CORS headers)</span>
+      </div>
+
+      <!-- Any site allowed -->
+      <div class="button-div">
+        <button id="corsTest2aButtonId">Read Data</button>
+        <span>GET</span>
+        <span id="corsTestUrl2aAttr">{{apiCors2aUrl}}</span>
+        <span> (Response accepted)</span>
+      </div>
+      <div class="button-div">
+        <button id="corsTest2bButtonId">Read Data</button>
+        <span>DELETE</span>
+        <span id="corsTestUrl2bAttr">{{apiCors2bUrl}}</span>
+        <span> (Response accepted)</span>
+      </div>
+
+      <!-- One site allowed -->
+      <div class="button-div">
+        <button id="corsTest3aButtonId">Read Data</button>
+        <span>GET</span>
+        <span id="corsTestUrl3aAttr">{{apiCors3aUrl}}</span>
+        <span> (Response Accepted)</span>
+      </div>      
+      <div class="button-div">
+        <button id="corsTest3bButtonId">Read Data</button>
+        <span>DELETE </span>
+        <span id="corsTestUrl3bAttr">{{apiCors3bUrl}}</span>
+        <span> (Response Accepted)</span>
+      </div> 
+
+      <div class="info-div" >
+        <pre id="corsTestText"></pre>
+        <div class="error-text" id="corsTestErrorText"></div>
+      </div>
+
+      <div class="footer">
+        Collab-frontend Cors Demo
+      </div>
+    </div>
+  </body>
+</html>
