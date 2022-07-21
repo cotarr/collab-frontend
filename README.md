@@ -1,3 +1,23 @@
+# ---------- BRANCH NOTES ----------
+
+Branch: cors-demo
+
+This branch includes an independent web page `cors-demo.html` that includes a 
+simple demonstration of use of cors middleware. This is not part of the oauth 
+functionality. Since the oauth demo included 3 independent web servers, it
+was trivial to try a little experiment to better understand cors policies.
+This branch will not be merged to the main branch.
+
+Repositories modified: collab-backend-api, collab-frontent
+
+- To run cors demo:
+  - Start collab-auth server
+  - Select cors-demo branch and start collab-frontend
+  - Select cors-demo branch, add env variable SITE_FRONTEND_CORS_HOST set to collab-frontend hostname, start collab-backend-api
+  - After login to the main page, open `cors-demo.html`
+
+# -------- End Branch Notes --------
+
 # colab-frontend
 
 This is 2 of 4 repositories.

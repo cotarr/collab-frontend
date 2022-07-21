@@ -1,3 +1,15 @@
+# Branch notes
+
+- This is an independent branch created to experiment with cors policies.
+- This branch will not be merged with the main branch (see README.md)
+
+### Branch changes:
+
+- server/app.js - Add URL for collab-backend-api to the Content Security Policy   `connect-src`
+- server/app.js - Rewrite real time text substitution to html pages for insertion of CSRF tokens and URL addresses of the servers for the cors demo.
+- secure/cors-demo.html - New file for cors demo
+- secure/js/cors-demo.js - New File for cors demo
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
