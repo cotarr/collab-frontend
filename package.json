@@ -1,6 +1,6 @@
 {
   "name": "collab-frontend",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Demo web server used on a collaboration project for learning oauth2orize and passport",
   "main": "bin/www",
   "scripts": {
@@ -18,11 +18,11 @@
   },
   "homepage": "https://github.com/cotarr/collab-frontend#readme",
   "dependencies": {
+    "@dr.pogodin/csurf": "^1.12.2",
     "compression": "^1.7.4",
     "connect-redis": "^6.1.3",
-    "csurf": "^1.11.0",
     "dotenv": "^16.0.1",
-    "express": "^4.18.1",
+    "express": "^4.18.2",
     "express-http-proxy": "^1.6.2",
     "express-session": "^1.17.3",
     "helmet": "^5.1.0",

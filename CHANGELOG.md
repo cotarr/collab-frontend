@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.0.8](https://github.com/cotarr/collab-frontend/releases/tag/v0.0.8) 2023-01-01
+
+### Changed
+
+Replaced deprecated package `csurf` with forked repository `@dr.pogodin/csurf`. 
+This package is used to validate CSRF tokens included with POST requests to 
+reduce risk of cross site request forgery attempts. 
+
+The forked version is a direct replacement for csurf@1.11.0. No code changes were required.
+
+Npm dependency update: express@4.18.2
+
 ## [v0.0.7](https://github.com/cotarr/collab-frontend/releases/tag/v0.0.7) 2022-11-15
 
 ### Changed
