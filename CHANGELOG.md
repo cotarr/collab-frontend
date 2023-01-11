@@ -7,7 +7,7 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [v0.0.10](https://github.com/cotarr/collab-auth/releases/tag/v0.0.10) 2023-01-11
+## [v0.0.10](https://github.com/cotarr/collab-frontend/releases/tag/v0.0.10) 2023-01-11
 
 ### Changed
 
