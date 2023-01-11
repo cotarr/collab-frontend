@@ -1,6 +1,6 @@
 {
   "name": "collab-frontend",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Demo web server used on a collaboration project for learning oauth2orize and passport",
   "main": "bin/www",
   "scripts": {
@@ -34,10 +34,10 @@
     "redis": "^3.1.2"
   },
   "devDependencies": {
-    "eslint": "^7.30.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.23.4",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0"
+    "eslint": "^8.31.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-promise": "^6.1.1"
   }
 }
