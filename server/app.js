@@ -159,13 +159,19 @@ if (config.session.enableRedis) {
   // Clear all:  FLUSHALL
   console.log('Using redis for session storage');
   sessionStore.redis = require('redis');
-  sessionStore.RedisStore = require('connect-redis')(session);
+  sessionStore.RedisStore = require('connect-redis').default;
   const redisClientOptions = {};
   // must match /etc/redis/redis.conf "requirepass <password>"
   if ((config.session.redisPassword) && (config.session.redisPassword.length > 0)) {
     redisClientOptions.password = config.session.redisPassword;
   }
   sessionStore.redisClient = sessionStore.redis.createClient(redisClientOptions);
+  sessionStore.redisClient.connect()
+    .catch((err) => {
+      console.log('redis-server error: ', err.toString());
+      // fatal error
+      process.exit(1);
+    });
   const redisStoreOptions = {
     client: sessionStore.redisClient,
     prefix: config.session.redisPrefix
