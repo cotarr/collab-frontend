@@ -8,6 +8,9 @@ and this project adheres to
 
 ## v0.0.11-Dev (Draft) 2023-06-30
 
+- Delete package-lock.json and egenerate V3 package-lock.json. 
+- Edit package-lock.json to force semver@7.5.3, then run npm audit fix to clear audit warnings.
+- Re-install eslint to current version and fix new linting errors
 - Dependency updates @dr.pogodin/csurf@1.13.0, dotenv@16.3.1, node-fetch@2.6.12, passport-oauth2@1.7.0
 - For security headers, upgrade helmet@7.0.0 and edit app.js for helmet options to match current version.
 - For redis session store, upgrade redis@4.6.7, connect-redis@7.1.0 and edit app.js to fix breaking changes in connect-redis.
