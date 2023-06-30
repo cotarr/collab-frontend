@@ -8,6 +8,7 @@ and this project adheres to
 
 ## v0.0.11-Dev (Draft) 2023-06-30
 
+- For security headers, upgrade helmet@7.0.0 and edit app.js for helmet options to match current version.
 - For redis session store, upgrade redis@4.6.7, connect-redis@7.1.0 and edit app.js to fix breaking changes in connect-redis.
 
 ## [v0.0.10](https://github.com/cotarr/collab-frontend/releases/tag/v0.0.10) 2023-01-11
