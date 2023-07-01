@@ -62,7 +62,7 @@ exports.check = (options) => {
 
     //
     // ---------------------------
-    // Http reqpest is authorized
+    // Http request is authorized
     // ---------------------------
     //
     // if refresh token disabled in config, then authorization decision
@@ -123,6 +123,7 @@ exports.check = (options) => {
     // fetch new token from authorization server using Oauth 2.0 refresh_token grant type.
     //
     } else {
+      const fetchController = new AbortController();
       const body = {
         client_id: config.oauth2.clientId,
         client_secret: config.oauth2.clientSecret,
@@ -131,26 +132,39 @@ exports.check = (options) => {
       };
       const fetchOptions = {
         method: 'POST',
-        timeout: 5000,
+        redirect: 'error',
+        cache: 'no-store',
+        signal: fetchController.signal,
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json'
         },
         body: JSON.stringify(body)
       };
-      const fetchUrl = config.oauth2.authURL + '/oauth/token';
-
-      fetch(fetchUrl, fetchOptions)
+      const fetchURL = config.oauth2.authURL + '/oauth/token';
+      const fetchTimerId = setTimeout(() => fetchController.abort(), 5000);
+      fetch(fetchURL, fetchOptions)
         .then((response) => {
           if (response.ok) {
             return response.json();
           } else {
-            throw new Error('Fetch status ' + response.status + ' ' +
-            fetchOptions.method + ' ' + fetchUrl);
+            // Retrieve error message from remote web server and pass to error handler
+            return response.text()
+              .then((remoteErrorText) => {
+                const err = new Error('HTTP status error');
+                err.status = response.status;
+                err.statusText = response.statusText;
+                err.remoteErrorText = remoteErrorText;
+                if (response.headers.get('WWW-Authenticate')) {
+                  err.oauthHeaderText = response.headers.get('WWW-Authenticate');
+                }
+                throw err;
+              });
           }
         })
         .then((tokenResponse) => {
           // console.log(tokenResponse);
+          if (fetchTimerId) clearTimeout(fetchTimerId);
           const nowSeconds = Math.floor((new Date().getTime()) / 1000);
           const expires = nowSeconds + parseInt(tokenResponse.expires_in);
           req.session.passport.user.ticket.access_token = tokenResponse.access_token;
@@ -165,10 +179,25 @@ exports.check = (options) => {
           // update of access_token was successful, continue processing nodejs request chain.
           return next();
         })
-        .catch((error) => {
+        .catch((err) => {
+          if (fetchTimerId) clearTimeout(fetchTimerId);
+          // Build generic error message to catch network errors
+          let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
+            (err.message || err.toString() || 'Error'));
+          if (err.status) {
+            // Case of HTTP status error, build descriptive error message
+            message = ('HTTP status error, ') + err.status.toString() + ' ' +
+              err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
+          }
+          if (err.remoteErrorText) {
+            message += ', ' + err.remoteErrorText;
+          }
+          if (err.oauthHeaderText) {
+            message += ', ' + err.oauthHeaderText;
+          }
+          console.log(message);
           // Most likely error is expired refresh_token or invalid refresh_token
-          // Treat this is as nomrmal unauthorized response
-          console.log(error.toString() || error);
+          // Treat this is as normal unauthorized response
           if ((_options.redirectURL) && (options.redirectURL.length > 0)) {
             if (req.session) {
               if ((req._parsedOriginalUrl) && (req._parsedOriginalUrl.pathname)) {

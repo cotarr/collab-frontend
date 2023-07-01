@@ -55,7 +55,7 @@ No website files will load until the user successfully provides a username and p
 Any unauthorized attempt to view the page will redirect the browser to an
 unauthorized landing page with a user login button.
 Clicking the [login] button on the landing page will send the web browser to a local /login 
-route which will redirect the browser (302) to the authorizaton server.
+route which will redirect the browser (302) to the authorization server.
 After successful entry of username and password, the authorization server will redirect
 the browser back to the original web site with an authorization code.
 This web server will then submit the authorization code to the authorization server and
@@ -189,6 +189,9 @@ SERVER_TLS_CERT=
 SERVER_TLS=false
 SERVER_PORT=3000
 SERVER_PID_FILENAME=
+SERVER_LOG_ROTATE_INTERVAL=
+SERVER_LOG_ROTATE_SIZE=
+SERVER_LOG_FILTER=
 
 SESSION_SET_ROLLING_COOKIE=false
 SESSION_SET_SESSION_COOKIE=false
@@ -223,7 +226,7 @@ In this demonstration, expired cookies can be updated by refreshing the page.
 
 Access to the static files such as HTML, CSS and JS are authorized by
 the user's cookie that is stored on the collab-frontend web server.
-Validation of the cookie is performed by a check() funciton in the web server 
+Validation of the cookie is performed by a check() function in the web server 
 using information stored in the user's session.
 
 When the web server detects an expired cookie, a redirect (302) to /unauthorized
@@ -232,7 +235,7 @@ landing page with a [login] button. The login button will
 access a local /login route that will redirect (302) the browser the oauth workflow
 by sending the browser to /dialog/authorize path on the authorization server.
 
-The request to the /dialog/authorize path on the collab-auth authoriztion server 
+The request to the /dialog/authorize path on the collab-auth authorization server 
 will initiate a password entry workflow. Upon successful verification of the 
 user's identity by password entry, the authorization server will redirect (302)
 the browser back to the collab-frontend web server including an authorization 
@@ -298,7 +301,7 @@ to request a replacement access token.
 
 In the case where the users access token is expired or otherwise invalid,
 the frontend web server will look for a non-expired refresh token.
-If found, the web server will submit the refesh token directly to the
+If found, the web server will submit the refresh token directly to the
 authorization server at the /oauth/token route.
 The authorization server will verify the refresh token signature and status.
 If the refresh token is valid, the authorization server will return a new access token
@@ -316,7 +319,7 @@ refresh tokens as described above.
 
 If refresh tokens are enabled on the collab-auth server,
 user password entry followed by submission of the access code to the authorization
-server will return two tokens in the same reqeust, an access_token and refresh_token.
+server will return two tokens in the same request, an access_token and refresh_token.
 Both are stored on the user's behalf in the user's session.
 
 Refresh Token Configuration:
@@ -357,7 +360,7 @@ of automatic token replacement of access tokens using refresh tokens.
 In the case of the collab-frontend web server, the original oauth2
 workflow involving user password entry, authorization code, and access token
 is handled by the passport-oauth2 strategy as configured in the
-`server/auth/passport-config.js` file. For compatibililty with 
+`server/auth/passport-config.js` file. For compatibility with 
 refresh tokens, the passport callback function will extract 
 the access token expiration time and store it in the session 
 so it can be used independently to handle refresh tokens.
@@ -371,13 +374,3 @@ token if needed before calling next() on the check middleware.
 
 Disclaimer: Code used in the check function to obtain replacement access tokens
 was written for this demo. The code has not been robustly tested.
-
-# Example Security Suggestions
-
-During the course of this project, several security suggestions 
-were discovered. Although not part of Oauth 2.0 specifically, 
-security weaknesses can compromise sites that use oauth.
-The collab-frontend contains a second page at /suggestions.html 
-where an example of input sanitization, csrf tokens, and 
-content security policy were tried. The examples are explained 
-on the page. You may find them intersting.

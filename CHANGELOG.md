@@ -8,12 +8,29 @@ and this project adheres to
 
 ## v0.0.11-Dev (Draft) 2023-06-30
 
-- Delete package-lock.json and egenerate V3 package-lock.json. 
+This edit started as a dependency update driven by GitHub dependabot dependency warning.
+During the editing, this evolved into a general code clean up of the repository.
+
+### Browser HTML/JS changes
+
+- A new dropdown navigation menu was added to the top left, and the page was divided in sections for each menu item.
+- A new dropdown menu was added to the top right for user logout and password change.
+- Added a new section to demonstrate use of scope values to restrict access to a resource.
+- Updated some of the descriptions on the page.
+- For the http fetch requests, timers were added, and upon status errors, the content of the error message is downloaded from web server.
+- Removed page with security suggestions. These are out of date and have no relation to oauth2 demo project.
+- Removed postman tests for security suggestion API, since they are no longer on the page.
+
+### Web server changes
+
+- Install npm rotating-file-stream and configure for log file rotation
+- Delete package-lock.json and regenerate V3 package-lock.json. 
 - Edit package-lock.json to force semver@7.5.3, then run npm audit fix to clear audit warnings.
 - Re-install eslint to current version and fix new linting errors
 - Dependency updates @dr.pogodin/csurf@1.13.0, dotenv@16.3.1, node-fetch@2.6.12, passport-oauth2@1.7.0
 - For security headers, upgrade helmet@7.0.0 and edit app.js for helmet options to match current version.
 - For redis session store, upgrade redis@4.6.7, connect-redis@7.1.0 and edit app.js to fix breaking changes in connect-redis.
+- Removed handling of routes for security suggestions from app.js to match web browser changes.
 
 ## [v0.0.10](https://github.com/cotarr/collab-frontend/releases/tag/v0.0.10) 2023-01-11
 

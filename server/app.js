@@ -121,7 +121,10 @@ app.get('/status', (req, res) => res.json({ status: 'ok' }));
 // Route for security.txt
 app.get('/.well-known/security.txt', securityContact);
 
-// From this point, reject all requests not maching vhost domain name
+// Route for robot policy
+app.get('/robots.txt', robotPolicy);
+
+// From this point, reject all requests not matching vhost domain name
 app.use(checkVhost.rejectNotVhost);
 
 // -----------------------------------------------------------------
@@ -199,10 +202,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 require('./auth/passport-config');
 
-// Route for robot policy
-app.get('/robots.txt', robotPolicy);
-
-// Edge case, IOS iPhone brwoser request
+// Edge case, IOS iPhone browser request
 // favicon.ico without cookie, causing
 // new authorization workflow to start
 app.get('/favicon.ico', function (req, res, next) {
@@ -216,7 +216,7 @@ app.get('/unauthorized', unAuthRoute.unAuthHtml);
 app.get('/unauthorized.css', unAuthRoute.unAuthStyles);
 
 // -------------------------
-// Authorizaton Routes
+// Authorization Routes
 // -------------------------
 app.get('/login', passport.authenticate('oauth2'));
 //
@@ -265,6 +265,27 @@ app.get('/proxy/oauth/introspect',
 );
 
 // -----------------------------------------------------
+// Mock REST API
+//
+// The request is expected to have a valid user cookie.
+// The auth.check() middleware is used to reject
+// requests that do not have a valid cookie.
+//
+// The request uses csurf middleware to reject
+// requests not having proper csrf token (403 Forbidden).
+// Methods GET and HEAD are excluded from the check.
+//
+// All requests to /api are handled using express-proxy
+// in the apiProxy route handler. Oauth 2.0 access_tokens
+// are added by the apiProxy middleware.
+// -----------------------------------------------------
+app.use('/api',
+  auth.check(),
+  csrfProtection,
+  apiProxy
+);
+
+// -----------------------------------------------------
 // Body Parser
 //
 // Issue: The apiProxy route here uses express-http-proxy.
@@ -291,27 +312,6 @@ app.use(express.json());
 // Decode x-www-form-urlencoded data from body.
 app.use(express.urlencoded({ extended: false }));
 
-// -----------------------------------------------------
-// Mock REST API
-//
-// The request is expected to have a valid user cookie.
-// The auth.check() middleware is used to reject
-// requests that do not have a valid cookie.
-//
-// The request uses csurf middleware to reject
-// requests not having proper csrf token (403 Forbidden).
-// Methods GET and HEAD are excluded from the check.
-//
-// All requests to /api are handled using express-proxy
-// in the apiProxy route handler. Oauth 2.0 access_tokens
-// are added by the apiProxy middleware.
-// -----------------------------------------------------
-app.use('/api',
-  auth.check(),
-  csrfProtection,
-  apiProxy
-);
-
 // -----------------------
 // Authenticated status
 // -----------------------
@@ -320,11 +320,8 @@ app.get('/secure',
   (req, res) => res.json({ secure: 'ok' })
 );
 
-// File path to static web site
-const secureDir = path.join(__dirname, '../secure');
-
 // ----------------------------------------------------
-// This is a simple render middleware function to
+// This is a simple middleware function to
 // substitute the {{csrf-token}} string for a random
 // generated CSRF token.
 //
@@ -335,7 +332,6 @@ const secureDir = path.join(__dirname, '../secure');
 // ----------------------------------------------------
 const insertCsrfTokenToHtmlPage = function (pageFilename) {
   return [
-    auth.check({ redirectURL: '/unauthorized' }),
     csrfProtection,
     function (req, res, next) {
       return fs.readFile(secureDir + pageFilename, 'utf8', function (err, data) {
@@ -344,10 +340,7 @@ const insertCsrfTokenToHtmlPage = function (pageFilename) {
         } else {
           // Render suggestions page
           // Generate and substitute csrfToken (2 places)
-          // Substutute URL for authorizaton server to demo CSP.
-          return res.send(data
-            .replace(/\{\{csrfToken\}\}/g, req.csrfToken())
-            .replace('{{authStatusUrl}}', config.oauth2.authURL + '/status')
+          return res.send(data.replace('{{csrfToken}}', req.csrfToken())
           );
         }
       });
@@ -357,16 +350,27 @@ const insertCsrfTokenToHtmlPage = function (pageFilename) {
 // ------------------------------------------------
 // Pages to be rendered with CSRF token inserted.
 // ------------------------------------------------
-app.get('/suggestions.html', insertCsrfTokenToHtmlPage('/suggestions.html'));
+app.get('/',
+  auth.check({ redirectURL: '/unauthorized' }),
+  insertCsrfTokenToHtmlPage('/index.html'));
+
+app.get('/index.html',
+  auth.check({ redirectURL: '/unauthorized' }),
+  insertCsrfTokenToHtmlPage('/index.html'));
 
 // -------------------------------
 // Web server for static files
 // All static files require authorization
 // using a valid cookie.
 // -------------------------------
+
+// File path to static web site
+const secureDir = path.join(__dirname, '../secure');
+
 console.log('Serving files from: ' + secureDir);
 app.use(
-  auth.check({ redirectURL: '/unauthorized' }),
+  auth.check(),
+  // auth.check({ redirectURL: '/unauthorized' }),
   express.static(secureDir)
 );
 

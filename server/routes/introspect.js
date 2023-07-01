@@ -20,10 +20,13 @@ const fetchIntrospect = (req, callback) => {
     const body = {
       access_token: accessToken
     };
-    const fetchUrl = config.oauth2.authURL + '/oauth/introspect';
+    const fetchController = new AbortController();
+    const fetchURL = config.oauth2.authURL + '/oauth/introspect';
     const fetchOptions = {
       method: 'POST',
-      timeout: 5000,
+      redirect: 'error',
+      cache: 'no-store',
+      signal: fetchController.signal,
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -31,31 +34,50 @@ const fetchIntrospect = (req, callback) => {
       },
       body: JSON.stringify(body)
     };
-    fetch(fetchUrl, fetchOptions)
+    const fetchTimerId = setTimeout(() => fetchController.abort(), 5000);
+    fetch(fetchURL, fetchOptions)
       .then((response) => {
         if (response.ok) {
           return response.json();
         } else {
-          let errorString = 'Fetch status ' + response.status + ' ' +
-            fetchOptions.method + ' ' + fetchUrl;
-          // If WWW-Authentication header is present, append it.
-          const wwwAuthenticateHeader = response.headers.get('WWW-Authenticate');
-          if (wwwAuthenticateHeader) {
-            console.log('WWW-Authenticate header:', wwwAuthenticateHeader);
-            errorString += ' WWW-Authenticate header: ' + wwwAuthenticateHeader;
-          }
-          const err = new Error(errorString);
-          err.status = response.status;
-          throw err;
+          // Retrieve error message from remote web server and pass to error handler
+          return response.text()
+            .then((remoteErrorText) => {
+              const err = new Error('HTTP status error');
+              err.status = response.status;
+              err.statusText = response.statusText;
+              err.remoteErrorText = remoteErrorText;
+              if (response.headers.get('WWW-Authenticate')) {
+                err.oauthHeaderText = response.headers.get('WWW-Authenticate');
+              }
+              throw err;
+            });
         }
       })
       .then((introspect) => {
         // console.log(introspect);
+        if (fetchTimerId) clearTimeout(fetchTimerId);
         callback(null, introspect);
       })
       .catch((err) => {
-        console.log(err);
-        callback(err);
+        if (fetchTimerId) clearTimeout(fetchTimerId);
+        // Build generic error message to catch network errors
+        let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
+          (err.message || err.toString() || 'Error'));
+        if (err.status) {
+          // Case of HTTP status error, build descriptive error message
+          message = ('HTTP status error, ') + err.status.toString() + ' ' +
+            err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
+        }
+        if (err.remoteErrorText) {
+          message += ', ' + err.remoteErrorText;
+        }
+        if (err.oauthHeaderText) {
+          message += ', ' + err.oauthHeaderText;
+        }
+        const error = new Error(message);
+        if (err.status) error.status = err.status;
+        callback(error);
       });
   } else {
     const err = new Error('Access token not found');
@@ -69,10 +91,10 @@ const fetchIntrospect = (req, callback) => {
 const user = (req, res, next) => {
   fetchIntrospect(req, (err, data) => {
     if (err) {
-      if ((err.status) && (parseInt(err.status) === 401)) {
+      if ((err.status) && (err.status === 401)) {
         // Special case, this is passing through status of the auth server
         return res.status(401).send('Unauthorized');
-      } else if ((err.status) && (parseInt(err.status) === 403)) {
+      } else if ((err.status) && (err.status === 403)) {
         // Special case, this is passing through status of the auth server
         return res.status(403).send('Forbidden');
       } else {
@@ -98,8 +120,17 @@ const user = (req, res, next) => {
 const introspect = (req, res, next) => {
   fetchIntrospect(req, (err, data) => {
     if (err) {
-      console.log(err.message);
-      res.status(502).send('Bad Gateway');
+      //
+      // This route is a demonstration of oauth2 token as seen by the web server.
+      // For this demo, oauth2 server fetch errors are passed to the browser for display.
+      // In normal situations, the this would not be visible to the user in the web browser.
+      // The error is available to backend code if needed for logging or other purposes.
+      //
+      let statusCode = 500;
+      if ((err.status) && (err.status >= 400)) {
+        statusCode = err.status;
+      }
+      return res.status(statusCode).send('Introspect fetch error: ' + err.message);
     } else {
       res.json(data);
     }

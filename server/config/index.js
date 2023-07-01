@@ -21,7 +21,10 @@ exports.server = {
   serverTlsCert: process.env.SERVER_TLS_CERT || '',
   tls: (process.env.SERVER_TLS === 'true') || false,
   port: parseInt(process.env.SERVER_PORT || '3000'),
-  pidFilename: process.env.SERVER_PID_FILENAME || ''
+  pidFilename: process.env.SERVER_PID_FILENAME || '',
+  logRotateInterval: process.env.SERVER_LOG_ROTATE_INTERVAL || '',
+  logRotateSize: process.env.SERVER_LOG_ROTATE_SIZE || '',
+  logFilter: process.env.SERVER_LOG_FILTER || ''
 };
 
 exports.session = {

@@ -31,7 +31,8 @@
     "node-fetch": "^2.6.12",
     "passport": "^0.6.0",
     "passport-oauth2": "^1.7.0",
-    "redis": "^4.6.7"
+    "redis": "^4.6.7",
+    "rotating-file-stream": "^3.1.0"
   },
   "devDependencies": {
     "eslint": "^8.43.0",

@@ -47,7 +47,7 @@
 			"response": []
 		},
 		{
-			"name": "(clear cookies)",
+			"name": "(clear both cookies)",
 			"event": [
 				{
 					"listen": "test",
@@ -61,10 +61,10 @@
 							"// \"CookieStore: programmatic access to \"localhost\" is denied\"}",
 							"const jar = pm.cookies.jar();",
 							"jar.clear('localhost', (err) => {",
-							"    if (err) console.log(err);",
+							"    if (err) throw(err);",
 							"});",
 							"jar.clear('127.0.0.1', (err) => {",
-							"    if (err) console.log(err);",
+							"    if (err) throw(err);",
 							"});",
 							""
 						],
@@ -88,7 +88,7 @@
 			"response": []
 		},
 		{
-			"name": "(auth-0) /logout (clear cookies)",
+			"name": "(auth-0) /logout",
 			"event": [
 				{
 					"listen": "test",
@@ -139,9 +139,9 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{auth_host}}/logout",
+					"raw": "{{frontend_host}}/logout",
 					"host": [
-						"{{auth_host}}"
+						"{{frontend_host}}"
 					],
 					"path": [
 						"logout"
@@ -827,237 +827,6 @@
 			"response": []
 		},
 		{
-			"name": "/suggestions.html (csrfToken) Copy",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include('<title>collab-frontend - Suggestions</title>');",
-							"});",
-							"",
-							"pm.test(\"Extract CSRF token to global variables\", function () {",
-							"    let body = pm.response.text();",
-							"    let bodyArray = body.split('\\n');",
-							"    let csrfToken = '';",
-							"    let splitByQuote = bodyArray[5].split('\"');",
-							"    if (splitByQuote[1] === 'csrf-token') {",
-							"        csrfToken = splitByQuote[3];",
-							"    }",
-							"    console.log('csrf_token: ', csrfToken);",
-							"    pm.globals.set('csrf_token', csrfToken);",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{frontend_host}}/suggestions.html",
-					"host": [
-						"{{frontend_host}}"
-					],
-					"path": [
-						"suggestions.html"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "/api/v1/data/manual-data/",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 204\", function () {",
-							"    pm.response.to.have.status(204);",
-							"});",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "CSRF-Token",
-						"value": "{{csrf_token}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"id\": \"435bf533-7280-4dce-a9d0-2960b43019f9\",\n    \"weather\": \"Partly Cloudy\"\n}\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{frontend_host}}/api/v1/data/manual-data/435bf533-7280-4dce-a9d0-2960b43019f9",
-					"host": [
-						"{{frontend_host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"data",
-						"manual-data",
-						"435bf533-7280-4dce-a9d0-2960b43019f9"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "/api/v1/data/manual-data/",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Your test name\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.weather).to.equal('Partly Cloudy');",
-							"});",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{frontend_host}}/api/v1/data/manual-data/435bf533-7280-4dce-a9d0-2960b43019f9",
-					"host": [
-						"{{frontend_host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"data",
-						"manual-data",
-						"435bf533-7280-4dce-a9d0-2960b43019f9"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "/api/v1/data/manual-data/id",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 204\", function () {",
-							"    pm.response.to.have.status(204);",
-							"});",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "CSRF-Token",
-						"value": "{{csrf_token}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"id\": \"435bf533-7280-4dce-a9d0-2960b43019f9\",\n    \"weather\": \"Raining\"\n}\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{frontend_host}}/api/v1/data/manual-data/435bf533-7280-4dce-a9d0-2960b43019f9",
-					"host": [
-						"{{frontend_host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"data",
-						"manual-data",
-						"435bf533-7280-4dce-a9d0-2960b43019f9"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "/api/v1/data/manual-data/",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Your test name\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.weather).to.equal('Raining');",
-							"});",
-							"",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{frontend_host}}/api/v1/data/manual-data/435bf533-7280-4dce-a9d0-2960b43019f9",
-					"host": [
-						"{{frontend_host}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"data",
-						"manual-data",
-						"435bf533-7280-4dce-a9d0-2960b43019f9"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "/status (clear localhost cookies)",
 			"event": [
 				{
@@ -1072,7 +841,7 @@
 							"// \"CookieStore: programmatic access to \"localhost\" is denied\"}",
 							"const jar = pm.cookies.jar();",
 							"jar.clear('localhost', (err) => {",
-							"    if (err) console.log(err);",
+							"    if (err) throw (err);",
 							"});",
 							"",
 							""

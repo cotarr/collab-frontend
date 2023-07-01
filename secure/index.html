@@ -13,165 +13,349 @@
   <body>
     <div class="head-fixed">
       <div class="head-flex">
-        <div class="head-left header-font">
-          collab-frontend
+        <div>
+          <div id='navDropdownButton' class="hambuger-icon">
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+          </div>
+        </div>
+        <div class="head-center">
+          <div class="header-title">collab-frontend</div>
         </div>
         <div class="head-right">
-          <span id="headerName"></span>
-          <a href="/logout"><button>Logout</button></a>
+          <button id="userDropdownButton" class="user-dropdown-button"></button>
         </div>
       </div>
     </div>
+    <div id="userDropdownDiv" class="user-dropdown-div">
+      <a href="/changepassword">Change Password</a>
+      <a href="/logout" id="logoutTag">Logout...</a>
+    </div>
+    <div id="navDropdownDiv" class="nav-dropdown-div">
+      <button class="button" id='page01Button'>+ Home</button>
+      <span class="level1-span page01" collapsed><a class="level1-a" href="#overview">Overview</a></span>
+      <span class="level1-span page01" collapsed><a class="level1-a" href="#tryapi">Try the API</a></span>
+      <span class="level1-span page01" collapsed><a class="level1-a" href="#introspect">Introspect Endpoint</a></span>
+      <span class="level1-span page01" collapsed><a class="level1-a" href="#userinfo">Userinfo Endpoint</a></span>
+      <span class="level1-span page01" collapsed><a class="level1-a" href="#scopefail">Insufficient Scope</a></span>
+      <span class="level1-span page01" collapsed><a class="level1-a" href="#password">Password Change</a></span>
+    </div>
 
-    <div class="scrollable-div">
+    <div class="scrollable-div" id="scrollableDiv">
 
-      <div class="center">
-        <img class="image" src="images/home-network-oauth2.png" alt="home network oauth2 network" width="80%" height="80%">
-      </div>
-
-      <h3 class="h3-style">Overview</h3>
-
-      <div class="description-contents">
-        <p>
-          This git repository is one of 4 repositories that were
-          created as a learning project to learn Oauth 2.0. The diagram above shows
-          the entire project with authorization server, mock web server, mock database server,
-          and mock IOT device.
-        </p>
-        <p>
-          This web page and associated web server (collab-frontend) demonstrate how
-          a user can interact with the overall project.
-          The diagram below shows the frontend web server at the center.
-          The overall purpose of this page is to demonstrate the relationship
-          between the user's cookie stored in the web browser on the left, the user's
-          Oauth 2.0 access_token, stored in the frontend
-          web server in the middle, and use of the token to access resources on the
-          backend API server shown on the right.
-        </p>
+      
+      <div id="page01SectionOverview">
         <div class="center">
-          <img class="image" src="images/cookie-to-token.png" alt="Exchange cookie for access token" width="75%" height="75%">
+          <img class="image" src="images/home-network-oauth2.png" alt="home network oauth2 network" width="80%" height="80%">
+        </div>
+
+        <h3 class="h3-style">Overview</h3>
+
+        <div class="description-contents">
+          <p>
+            This git repository is the 2nd out of 4 repositories that were
+            created as a learning project to learn Oauth 2.0. The diagram above shows
+            the entire project with authorization server, mock web server, mock database server,
+            and mock IOT device.
+          </p>
+          <p>
+            This web page and associated web server (collab-frontend) demonstrate how
+            a user can interact with the overall project.
+            The diagram below shows the frontend web server at the center.
+            The overall purpose of this page is to demonstrate the relationship
+            between the user's cookie stored in the web browser on the left, the user's
+            Oauth 2.0 access_token, stored in the frontend
+            web server in the middle, and use of the token to access resources on the
+            backend API server shown on the right.
+          </p>
+          <div class="center">
+            <img class="image" src="images/cookie-to-token.png" alt="Exchange cookie for access token" width="75%" height="75%">
+          </div>
+            <p>
+              The upper left corner of the page include a menu icon that will display 
+              a selection menu along the left side of the page. Each section includes a description
+              of the specific demonstration for that page.
+            </p>
         </div>
       </div>
 
+      <div id="page01SectionTryApi">
+        <h3 class="h3-style">Try the API</h3>
 
-
-      <h3 class="h3-style">Try the API</h3>
-
-      <div class="description-contents">
-        <p>
-          It is a good assumption you have the mock web server (collab-frontend)
-          running, or you would not see this page.
-        </p>
-        <p>
-          It is also a good assumption that the login and logout buttons are
-          working. This indicates the authorization server is working (collab-auth).
-        </p>
-        <p>
-          If the mock database is running (collab-backend-api), pressing this
-          [Fetch Data] button will generate an API query request.
-          The frontend web server will receive the request, validate the user's cookie,
-          then retrieve an oauth 2.0 access token that was stored on the user's behalf.
-          The web server will add the users access token and pass the request 
-          to the backend API server.
-          If the token is successfully validated, then the backend API will 
-          return an array in JSON format and it will be displayed.
-        </p>
-        <p>
-          If the mock IOT device is also running (collab-iot-device),
-          the IOT device will periodically submit emulated data to the mock database
-          using a timer.
-          If the mock IOT device is not running, or it is unable to
-          obtain a valid client access_token,
-          then the mock API will contain no data and an empty array will be displayed [ ].
-        </p>
-      </div>
-
-      <div class="button-div">
-        <button id="clearDisplayButton">Clear</button>
-        <button id="iotDataButton">Fetch Data</button>
-        <span>GET /api/v1/data/iot-data/</span>
-      </div>
-      <div class="button-div">
-      </div>
-      <div class="info-div" >
-        <pre id="apiDataText"></pre>
-        <div class="error-text" id="apiErrorText"></div>
-      </div>
-
-      <h3 class="h3-style">Interspect Endpoint</h3>
-      <div class="description-contents">
-        <p>
-          This button is for demonstration purposes only.
-          Normally a user would never possess an access_token, and
-          therefore never have the need to validate a token.
-          In the frontend web server, there is a temporary development route
-          &quot;/proxy/oauth/introspect&quot that will submit the users"s
-          access_token to the authorization server
-          &quot;/oauth/introspect&quot; route.
-          The introspect endpoint validates the token and returns various
-          information about the user"s access_token that was submitted.
-          It is included here to show example response content.
-          The typical useful properties are: <b>active, scope, and user</b>.
-        </p>
-      </div>
-
-      <div class="button-div">
-        <button id="clearIntrospectButton">Clear</button>
-        <button id="introspectButton">Fetch Data</button>
-        <span>/proxy/oauth/introspect</span>
-      </div>
-      <div class="info-div" >
-        <pre id="introspectText"></pre>
-        <div class="error-text" id="introspectErrorText"></div>
-      </div>
-
-      <h3 class="h3-style">Userinfo Endpoint</h3>
-      <div class="description-contents">
-        <p>
-          The <b>/userinfo</b> endpoint is intended for use in determining
-          user"s current login status.
-          The response includes the logged in user name for display on the page (see header above)
-        </p>
-      </div>
-      <div class="button-div">
-        <button id="clearUserinfoButton">Clear</button>
-        <button id="userinfoButton">Fetch Data</button>
-        <span>/userinfo (for update page header)</span>
-      </div>
-      <div class="info-div" >
-        <pre id="userinfoText"></pre>
-        <div class="error-text" id="userinfoErrorText"></div>
-      </div>
-
-      <h3 class="h3-style">User Password Change</h3>
-      <div class="description-contents">
-        <p>
-          A web page will typically include a link that the user may use to
-          change their user password. In this case, the frontend web server
-          will accept the /changepassword route and redirect (302) to the
-          authorization server.
-        </p>
-      </div>
-      <div class="button-div">
-        <a href="/changepassword"><button>Change Password</button></a>
-        <span>/changepassword will redirect to authorization server.</span>
-      </div>
-
-      <h3 class="h3-style">Security Suggestions</h3>
-      <div class="description-contents">
-        <p>
-          The button below will show a page with a few examples of some
-          security suggestions that were encountered during this project
-          as they relate to the frontend web server.
-          These are general suggestions that are not specific to oauth 2.0.
-        </p>
-        <div>
-          <a href="/suggestions.html"><button ">Security Suggestions</button></a>
-          <span>Page showing examples</span>
+        <div class="description-contents">
+          <p>
+            It is a good assumption you have the mock web server (collab-frontend)
+            running, or you would not see this page.
+          </p>
+          <p>
+            It is also a good assumption that the login and logout buttons are
+            working. This indicates the authorization server is working (collab-auth).
+          </p>
+          <p>
+            Pressing the [Fetch Data] button will generate an API query request.
+            The frontend web server will receive the request, validate the user's cookie,
+            then retrieve an oauth 2.0 access token that was stored on the user's behalf.
+            The web server will add the users access token and pass the request 
+            to the backend API server.
+            If the token is successfully validated, then the backend API will 
+            return an array in JSON format and it will be displayed.
+          </p>
+          <p>
+            To better observe this process, it is recommended to have 
+            the browser development tools open to the network tab or console tab.
+            Additionally, terminal windows should be open for each server. 
+            The access log will show the Oauth2 handshakes as they occur.
+          </p>
         </div>
+        
+        <div class="button-div">
+          <button id="clearDisplayButton">Clear</button>
+          <button id="iotDataButton">Fetch Data</button>
+          <span>GET /api/v1/data/iot-data/</span>
+        </div>
+        <div class="button-div">
+        </div>
+        <div class="info-div" >
+          <pre id="apiDataText"></pre>
+          <div class="error-text" id="apiErrorText"></div>
+        </div>
+        <div class="description-contents">
+          <p>
+            <p>
+              If you are the first step of the demonstration, only this web server (collab-frontend)
+              and the authorization server (collab-auth) are running. In this case, pressing the
+              button will generate the error &quot;Error, connect ECONNREFUSED&quot;.
+              This is the expected result when the API database server is not running.
+            </p>
+            <p>
+              At the second step of the demonstration, the backend API database server (collab-backend-api)
+              will be running. However, at this stage no data will have been saved into the database.
+              Pressing the button will query the database, but an empty array will be returned 
+              such as &quot;[ ]&quot;. This is the expected result when the database table is empty.
+            </p>
+            <p>
+              At the final stage of the demonstration, the mock IOT device is also running (collab-iot-device).
+              At 1 minute intervals, the IOT device will periodically submit emulated data 
+              to the mock database using a timer.
+              The expected response is an array of JSON objects that contain emulated sensor data.
+              Since this is a demonstration, the array is automatically prunded to 10 entries
+            </p>
+            <p>
+              When you reach the <a href="#scopefail">Insufficient Scope</a> panel further on in this page, a more detail 
+              explanation of the data exchange is provided.
+            </p>
+          </p>
+          </div>
+      </div>
+
+      <div id="page01SectionIntrospect">
+        <h3 class="h3-style">Interspect Endpoint</h3>
+        <div class="description-contents">
+          <p>
+            This section is included  for demonstration purposes only.
+            Normally a user would never possess an access_token, and
+            therefore never have the need to validate a token.
+            In the frontend web server, there is a temporary development route
+            &quot;/proxy/oauth/introspect&quot that will submit the users"s
+            access_token to the authorization server
+            &quot;/oauth/introspect&quot; route.
+            The introspect endpoint validates the token and returns various
+            information about the user"s access_token that was submitted.
+            It is included here to show example response content.
+            The typical useful properties are: <b>active, scope, and user</b>.
+          </p>
         </div>
 
+        <div class="button-div">
+          <button id="clearIntrospectButton">Clear</button>
+          <button id="introspectButton">Fetch Data</button>
+          <span>/proxy/oauth/introspect</span>
+        </div>
+        <div class="info-div" >
+          <pre id="introspectText"></pre>
+          <div class="error-text" id="introspectErrorText"></div>
+        </div>
+        <div class="description-contents">
+          <p>
+            The following values are relevant.
+          </p>
+          <ul>
+            <li>active - This should be check to confirm a value of true.</li>
+            <li>grant_type - This will normally show &quot;authorization_code&quot;. If the original token is expired, the replacement token will show type &quot;refresh_token&quot;.</li>
+            <li>expires_in - This value represents the timer remaining in seconds until the token expires.</li>
+            <li>scope - This is a list of scope string values, such as api-read or apr-write that are used to grant granular permissions to a specific resource.</li>
+            <li>client.clientId - This is useful to identify the proper client account when editing the allowedScope for the client account</li>
+          </ul>
+          <p>
+            These values are held in the web server session database. They are not available to the user via the web browser.
+          </p>
+        </div>
+      </div>
 
+      <div id="page01SectionUserinfo">
+        <h3 class="h3-style">Userinfo Endpoint</h3>
+        <div class="description-contents">
+          <p>
+            The <b>/userinfo</b> endpoint is intended for use in determining
+            user"s current login status.
+            The response includes name of the logged in user which can be seen
+            in the upper right corner of this page.
+            The user information may also be useful in the browser to 
+            construct database queries for tables containing data from 
+            multiple different users, to specify the user currently logged into the page.
+          </p>
+        </div>
+        <div class="button-div">
+          <button id="clearUserinfoButton">Clear</button>
+          <button id="userinfoButton">Fetch Data</button>
+          <span>/userinfo (for update page header)</span>
+        </div>
+        <div class="info-div" >
+          <pre id="userinfoText"></pre>
+          <div class="error-text" id="userinfoErrorText"></div>
+        </div>
+        <div class="description-contents">
+          <p>
+            The following values are relevant.
+          </p>
+          <ul>
+            <li>id - In the case where the database contains data for multiple users, this may be used in the browser to build queries that return data specific to a user.</li>
+            <li>number - This functions the same as id and may be used to build queries.</li>
+            <li>username - This is the username that was used to log into the web page</li>
+            <li>name - This is intended to be the real name associated with the user login account. However any random string may be used for privacy. The value is displayed at the top right corner of the page.</li>
+            <li>scope - This is used to grant or restrict user access to specific routes and methods. More information is available in the <a href="#scopefail">Insufficient Scope</a> section.</li>
+          </ul>
+          <p>
+            These values are held in the web server session database. They are not available to the user via the web browser.
+          </p>
+        </div>
+      </div>
+
+      <div id="page01SectionScopeFail">
+        <h3 class="h3-style">Insufficient Scope</h3>
+        <div class="description-contents">
+          <p>
+            Scope is a complex and confusing part of OAuth2. 
+            The handling of scope is implementation dependant and may differ for different situations.
+            This intent of this section is to show that there are two levels of access control
+            associated with oauth2 tokens. First the token itself must be valid, with a good 
+            digital signature, non-expired timestamp, and it must not have been revoked.
+            In many cases, a valid token may be sufficient to allow access.
+            In the case where a deeper level of granularity is needed, a scheme of 
+            scope values can be implemented.
+          </p>
+          <p>
+            Consider the case where a user attempts to perform a query and request data from the database.
+            The request may be allowed or denied based on a specific user and a specific route and method.
+            For example, one user may be allowed to read a table, but denied write access.
+            Another user may be allowed both read and write access.
+            The oauth2 scope is used to allow or deny the database query.
+          </p>
+          <p>
+            It should be noted that this request is performed using the exact same access token that worked 
+            successfully in the Try The API example above.
+          </p>
+          <p>
+            In this demonstration, a route and method have been setup on the backend database server
+            such that our user Bob will not have sufficient scope to perform the request.
+            The expected response is status 403 Forbidden. 
+          </p>
+          </div>
+        <div class="button-div">
+          <button id="clearScopeFailButton">Clear</button>
+          <button id="scopeFailButton">Send PUT request</button>
+          <span>PUT /api/v1/data/iot-data/1</span>
+        </div>
+        <div class="info-div" >
+          <pre id="scopeFailText"></pre>
+          <div class="error-text" id="scopeFailErrorText"></div>
+        </div>
+        <div class="description-contents">
+          <p>
+            An oauth2 access token is created during the user login process. 
+            The access token is stored inside the web server on the user's behalf.
+            Step by step as follows:
+          </p>
+          <ul>
+            <li>User logs in.</li>
+            <li>A new cookie is created with unique ID. The cookie is digitally signed and returned to the user's browser.</li>
+            <li>The web server stores the cookie ID in the web server session database. This creates a place to store tokens.</li>
+            <li>An oauth2 client account (used by a specific web server) contains a list of allowed scopes.</li>
+            <li>An oauth user account contains a list of roles.</li>
+            <li>A web server access token request will include a third list of scope values that would be relevant to the web server for a specific purpose.</li>
+            <li>The three scope lists, client allowed scope, the users role, and the token request scopes are intersected to create the final token scope list.</li>
+            <li>A new access token ID is generated. The list of token scopes is stored in the token database for that ID, along with user's username and user ID.</li>
+            <li>The token ID is encoded into new access token's payload. The token is digitally signed.</li>
+            <li>The signed access token stored in the web server on behalf of the user. The end user does not have access to view or download the token.</li>
+            <li>The user login is complete. The web browser has a cookie. The web server has the user's access token.</li>
+          </ul>
+          <p>
+
+            Step by step of the data request.
+          </p>
+          <ul>
+            <li>Browser: The user's web browser has a valid cookie for this URL.</li>
+            <li>Browser: The cookie is submitted to the web server in the HTTP request headers.</li>
+            <li>Web Server: The cookie's digital signature is successfully validated.</li>
+            <li>Web Server: The cookie is decoded to extract the session ID that is associated with the user's cookie.</li>
+            <li>Web Server: The web server session database contains the user's access token for that session ID. The expiration time is checked and it is not expired.</li>
+            <li>Web Server: The access token from the user's session is appended to the HTTP request.</li>
+            <li>Web Server: The reverse proxy sends request on to the backend API database server</li>
+            <li>API database Server: The access token is extracted from the request</li>
+            <li>API database Server: The database API sends the access token to the authorization server introspect endpoint.</li>
+            <li>Authorization Server: The digital signature on the access token is successfully validated.</li>
+            <li>Authorization Server: The access token is decoded and the token ID is extracted.</li>
+            <li>Authorization Server: The token database is queried using token ID to get the token's meta-data, including username, user ID and scope list.</li>
+            <li>Authorization Server: The token's meta-data is returned to the API database server in the introspect response.
+            <li>API database Server: Each route and method has it's own list of allowed scope values. The token's meta-data scope list is compared to this specific route and method</li>
+            <li>API database Server: If route/method scope is found in the token's meta-data The request is allowed and the query results are returned.</li>
+            <li>API database server: If route/method scope is not found in the token's meta-data a 403 Forbidden response is returned</li>
+            <li>Web Server: The reverse proxy returns the response to the web browser.</li>
+            <li>Web Browser. The browser receives the response, either valid query data or else a 403 Forbidden response</li>
+          </ul>
+        </div>
+        <div class="description-contents">
+          <p>
+            Data sent in body of request using PUT method to the route &quot;/api/v1/data/iot-data/1&quot;.
+            This would emulate a typical request to modify the record's contents at index=1.
+          </p>
+    <pre>    {
+      id: 1,
+      deviceId: 'iot-device-12',
+      timestamp: '2021-09-17T15:32:08.417Z',
+      data1: 24.831,
+      data2: 27.241,
+      data3: 22.307
+    }</pre>      
+        </div>
+
+      </div>
+
+
+      <div id="page01SectionPassword">
+        <h3 class="h3-style">User Password Change</h3>
+        <div class="description-contents">
+          <p>
+            One of the benefits of Oauth2 is separation of the user login credentials 
+            from the basic operation of a web page. For a user on this page,
+            this creates a problem when they want to change their password, 
+            because the password is stored externally in the Oauth2 authorization server.
+            To address this, the web server will accept a <b>/changepassword</b> route 
+            which will return a 302 redirect to the change password URL on the 
+            authorization server (collab-auth).
+          </p>
+          <p>
+            Clicking the user's name in the upper right corner of the page 
+            will provide a dropdown menu such as link. Alternately, the button below will
+            accomplish the same.
+          </p>
+        </div>
+        <div class="button-div">
+          <a href="/changepassword"><button>Change Password</button></a>
+          <span>/changepassword will redirect to authorization server.</span>
+        </div>
+      </div>
       <div class="footer">
         Collab-frontend demo page.
       </div>

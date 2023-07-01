@@ -16,11 +16,11 @@ const proxyOptions = {
     delete proxyReqOpts.headers['csrf-token'];
     return proxyReqOpts;
   },
-  proxyErrorHandler: (err, res, next) => {
-    // 502 = Bad Gateway
-    err.status = 502;
-    return next(err);
-  },
+  // proxyErrorHandler: (err, res, next) => {
+  //   // 502 = Bad Gateway
+  //   err.status = 502;
+  //   return next(err);
+  // },
   timeout: 5000 // milliseconds
 };
 if (nodeEnv === 'production') {

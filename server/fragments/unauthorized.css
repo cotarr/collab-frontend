@@ -39,5 +39,23 @@ body {
 
 .head-right {
   display: inline;
-  padding-right: 10px;
+}
+
+.header-title {
+  font-size: 140%;
+  display: inline-block;
+}
+
+.user-dropdown-button {
+  background-color: #ffca1c;
+  color: black;
+  padding: 6px 10px 6px 10px;
+  font-size: 90%;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+/* Dropdown button on hover & focus */
+.user-dropdown-button:hover, .user-dropdown-button:focus {
+  background-color: #fdeaab;
 }
