@@ -1,7 +1,5 @@
 'use strict';
 
-const fetch = require('node-fetch');
-
 const getAccessToken = require('../auth/add-access-token').getAccessToken;
 
 const config = require('../config');

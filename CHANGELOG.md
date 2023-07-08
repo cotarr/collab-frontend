@@ -6,10 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.0.11-Dev (Draft) 2023-06-30
+## v1.0.0-Dev (Draft) 2023-07-08
 
 This edit started as a dependency update driven by GitHub dependabot dependency warning.
 During the editing, this evolved into a general code clean up of the repository.
+
+### BREAKING CHANGE - Node>=18
+
+- Increment major from 0 to 1 to reflect breaking change with node>=18
+- Add node version check to server/config/index.js
+- Add engines.node = ">=18" in package.json
+- Uninstall node-fetch v2 as a dependency. NodeJs native fetch() API will be used.
 
 ### Browser HTML/JS changes
 

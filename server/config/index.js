@@ -7,6 +7,14 @@ require('dotenv').config();
 
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
+// Check requirement for minimum node version
+const minNodeVersion = 18;
+if (parseInt(process.version.replace('v', '').split('.')[0]) < minNodeVersion) {
+  console.error('Error: this program requires node version ' +
+    minNodeVersion.toString() + ' or greater.');
+  process.exit(1);
+}
+
 exports.site = {
   // Vhost example: "auth.example.com". Use '*' to accept any URL or numeric IP
   vhost: process.env.SITE_VHOST || '*',
