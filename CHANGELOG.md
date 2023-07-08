@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.0.0-Dev (Draft) 2023-07-08
+## [v1.0.0](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.0) 2023-07-08
 
 This edit started as a dependency update driven by GitHub dependabot dependency warning.
 During the editing, this evolved into a general code clean up of the repository.
