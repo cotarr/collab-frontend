@@ -23,6 +23,8 @@ https://cotarr.github.io/collab-auth
 
 ### Install
 
+Requires Node version 18 or greater.
+
 ```bash
 git clone git@github.com:cotarr/collab-frontend.git
 cd collab-frontend

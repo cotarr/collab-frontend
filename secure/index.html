@@ -123,7 +123,7 @@
         <div class="description-contents">
           <p>
             <p>
-              If you are the first step of the demonstration, only this web server (collab-frontend)
+              At the first step of the demonstration, only this web server (collab-frontend)
               and the authorization server (collab-auth) are running. In this case, pressing the
               button will generate the error &quot;Error, connect ECONNREFUSED&quot;.
               This is the expected result when the API database server is not running.
@@ -139,7 +139,7 @@
               At 1 minute intervals, the IOT device will periodically submit emulated data 
               to the mock database using a timer.
               The expected response is an array of JSON objects that contain emulated sensor data.
-              Since this is a demonstration, the array is automatically prunded to 10 entries
+              Since this is a demonstration, the array is automatically pruned to 10 entries
             </p>
             <p>
               When you reach the <a href="#scopefail">Insufficient Scope</a> panel further on in this page, a more detail 
@@ -150,7 +150,7 @@
       </div>
 
       <div id="page01SectionIntrospect">
-        <h3 class="h3-style">Interspect Endpoint</h3>
+        <h3 class="h3-style">Introspect Endpoint</h3>
         <div class="description-contents">
           <p>
             This section is included  for demonstration purposes only.
@@ -181,14 +181,17 @@
             The following values are relevant.
           </p>
           <ul>
-            <li>active - This should be check to confirm a value of true.</li>
+            <li>active - To validate a request this must be checked to confirm the value equals true. It is not recommended to rely on a status 200 response alone.</li>
             <li>grant_type - This will normally show &quot;authorization_code&quot;. If the original token is expired, the replacement token will show type &quot;refresh_token&quot;.</li>
-            <li>expires_in - This value represents the timer remaining in seconds until the token expires.</li>
-            <li>scope - This is a list of scope string values, such as api-read or apr-write that are used to grant granular permissions to a specific resource.</li>
-            <li>client.clientId - This is useful to identify the proper client account when editing the allowedScope for the client account</li>
+            <li>expires_in - This value represents the time remaining in seconds until the token expires.</li>
+            <li>scope - This is a list of scope string values, such as &quot;api-read&quot; or &quot;apr-write&quot; that are used to grant granular permissions to a specific resource.</li>
+            <li>user.username - This is useful to identify the proper user account when editing the the user's role for the user account.</li></li>
+            <li>client.clientId - This is useful to identify the proper client account when editing the allowedScope for the client account.</li>
           </ul>
           <p>
-            These values are held in the web server session database. They are not available to the user via the web browser.
+            The token's meta-data values are held in the web server session database on the user's behalf. 
+            The web server will lookup the session information in the session database using the browser's cookie submitted with the request.
+            In a normal Oauth2 implementation using authorization code grant, the access token and token meta-data are not usually available to the end user via the web browser.
           </p>
         </div>
       </div>
@@ -197,13 +200,12 @@
         <h3 class="h3-style">Userinfo Endpoint</h3>
         <div class="description-contents">
           <p>
-            The <b>/userinfo</b> endpoint is intended for use in determining
-            user"s current login status.
+            The <b>/userinfo</b> endpoint is intended for use in determining user's current login status.
             The response includes name of the logged in user which can be seen
             in the upper right corner of this page.
             The user information may also be useful in the browser to 
             construct database queries for tables containing data from 
-            multiple different users, to specify the user currently logged into the page.
+            multiple different users, to specify the user currently logged into the webpage.
           </p>
         </div>
         <div class="button-div">
@@ -220,11 +222,15 @@
             The following values are relevant.
           </p>
           <ul>
-            <li>id - In the case where the database contains data for multiple users, this may be used in the browser to build queries that return data specific to a user.</li>
+            <li>id - In the case where the database contains data for multiple users, 
+              this may be used in the browser to build queries that return data specific to a user.</li>
             <li>number - This functions the same as id and may be used to build queries.</li>
             <li>username - This is the username that was used to log into the web page</li>
-            <li>name - This is intended to be the real name associated with the user login account. However any random string may be used for privacy. The value is displayed at the top right corner of the page.</li>
-            <li>scope - This is used to grant or restrict user access to specific routes and methods. More information is available in the <a href="#scopefail">Insufficient Scope</a> section.</li>
+            <li>name - This is intended to be the real name associated with the user login account. 
+              However any random string may be used for privacy. 
+              The value is displayed at the top right corner of the page.</li>
+            <li>scope - This is used to grant or restrict user access to specific routes and methods. 
+              More information is available in the <a href="#scopefail">Insufficient Scope</a> section.</li>
           </ul>
           <p>
             These values are held in the web server session database. They are not available to the user via the web browser.
@@ -239,7 +245,7 @@
             Scope is a complex and confusing part of OAuth2. 
             The handling of scope is implementation dependant and may differ for different situations.
             This intent of this section is to show that there are two levels of access control
-            associated with oauth2 tokens. First the token itself must be valid, with a good 
+            associated with oauth2 tokens. First, the token itself must be valid, with a good 
             digital signature, non-expired timestamp, and it must not have been revoked.
             In many cases, a valid token may be sufficient to allow access.
             In the case where a deeper level of granularity is needed, a scheme of 
@@ -279,12 +285,12 @@
           </p>
           <ul>
             <li>User logs in.</li>
-            <li>A new cookie is created with unique ID. The cookie is digitally signed and returned to the user's browser.</li>
+            <li>A new cookie is created with unique ID. The cookie is digitally signed. The cookie is returned to the user's browser.</li>
             <li>The web server stores the cookie ID in the web server session database. This creates a place to store tokens.</li>
             <li>An oauth2 client account (used by a specific web server) contains a list of allowed scopes.</li>
             <li>An oauth user account contains a list of roles.</li>
             <li>A web server access token request will include a third list of scope values that would be relevant to the web server for a specific purpose.</li>
-            <li>The three scope lists, client allowed scope, the users role, and the token request scopes are intersected to create the final token scope list.</li>
+            <li>The three scope lists, client allowed scope, the user's role, and the token request scopes are intersected to create the final token scope list.</li>
             <li>A new access token ID is generated. The list of token scopes is stored in the token database for that ID, along with user's username and user ID.</li>
             <li>The token ID is encoded into new access token's payload. The token is digitally signed.</li>
             <li>The signed access token stored in the web server on behalf of the user. The end user does not have access to view or download the token.</li>
@@ -309,7 +315,7 @@
             <li>Authorization Server: The token database is queried using token ID to get the token's meta-data, including username, user ID and scope list.</li>
             <li>Authorization Server: The token's meta-data is returned to the API database server in the introspect response.
             <li>API database Server: Each route and method has it's own list of allowed scope values. The token's meta-data scope list is compared to this specific route and method</li>
-            <li>API database Server: If route/method scope is found in the token's meta-data The request is allowed and the query results are returned.</li>
+            <li>API database Server: If route/method scope is found in the token's meta-data, the request is allowed and the query results are returned.</li>
             <li>API database server: If route/method scope is not found in the token's meta-data a 403 Forbidden response is returned</li>
             <li>Web Server: The reverse proxy returns the response to the web browser.</li>
             <li>Web Browser. The browser receives the response, either valid query data or else a 403 Forbidden response</li>
@@ -347,13 +353,20 @@
           </p>
           <p>
             Clicking the user's name in the upper right corner of the page 
-            will provide a dropdown menu such as link. Alternately, the button below will
-            accomplish the same.
+            will provide a dropdown menu containing the change password link. 
+            Alternately, the button below will accomplish the same.
           </p>
         </div>
         <div class="button-div">
           <a href="/changepassword"><button>Change Password</button></a>
           <span>/changepassword will redirect to authorization server.</span>
+        </div>
+        <div class="vs-10"></div>
+        <div class="description-contents">
+          <p>
+            In the current project, it will be necessary for the user to manually
+            navigate back to the main web page after changing their user password.
+          </p>
         </div>
       </div>
       <div class="footer">
