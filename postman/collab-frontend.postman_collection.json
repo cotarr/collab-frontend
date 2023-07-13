@@ -5,7 +5,7 @@
 	},
 	"item": [
 		{
-			"name": "(clear global variables)",
+			"name": "(auth) /logout clear cookie and variables",
 			"event": [
 				{
 					"listen": "test",
@@ -15,88 +15,15 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"Unset global variables\", function () {",
-							"    pm.globals.unset('transaction_id');",
-							"    pm.globals.unset('auth_code');",
-							"    pm.globals.unset('access_token');",
-							"    pm.globals.unset('refresh_token');",
-							"    pm.globals.unset('csrf_token');",
-							"    pm.globals.unset('testUsername');   ",
-							"    pm.globals.unset('testUserNumber');",
-							"    pm.globals.unset('testUserNumber');",
-							"    pm.globals.unset('createdUserUuid');",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{auth_host}}/status",
-					"host": [
-						"{{auth_host}}"
-					],
-					"path": [
-						"status"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "(clear both cookies)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"// The domain 127.0.0.1 must be whitelisted in postman to avoid error:",
-							"// \"CookieStore: programmatic access to \"localhost\" is denied\"}",
+							"// The domain 127.0.0.1 and localhost must be whitelisted in postman to avoid error:",
 							"const jar = pm.cookies.jar();",
-							"jar.clear('localhost', (err) => {",
-							"    if (err) throw(err);",
-							"});",
 							"jar.clear('127.0.0.1', (err) => {",
 							"    if (err) throw(err);",
 							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{auth_host}}/status",
-					"host": [
-						"{{auth_host}}"
-					],
-					"path": [
-						"status"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "(auth-0) /logout",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
+							"",
+							"pm.globals.unset('transaction_id');",
+							"pm.globals.unset('auth_code');",
+							"pm.globals.unset('csrf_token');",
 							"",
 							""
 						],
@@ -106,7 +33,13 @@
 			],
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xhtml+xml",
+						"type": "default"
+					}
+				],
 				"url": {
 					"raw": "{{auth_host}}/logout",
 					"host": [
@@ -120,7 +53,7 @@
 			"response": []
 		},
 		{
-			"name": "/logout (frontend)",
+			"name": "(web) /logout (frontend) clear cookie",
 			"event": [
 				{
 					"listen": "test",
@@ -128,6 +61,12 @@
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// The domain 127.0.0.1 and localhost must be whitelisted in postman to avoid error:",
+							"const jar = pm.cookies.jar();",
+							"jar.clear('localhost', (err) => {",
+							"    if (err) throw(err);",
 							"});",
 							""
 						],
@@ -137,7 +76,13 @@
 			],
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "default"
+					}
+				],
 				"url": {
 					"raw": "{{frontend_host}}/logout",
 					"host": [
@@ -151,7 +96,7 @@
 			"response": []
 		},
 		{
-			"name": "/ (redirect /unauthorized)",
+			"name": "(web-1) / (redirect /unauthorized)",
 			"event": [
 				{
 					"listen": "test",
@@ -174,7 +119,13 @@
 			],
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "default"
+					}
+				],
 				"url": {
 					"raw": "{{frontend_host}}/",
 					"host": [
@@ -188,7 +139,7 @@
 			"response": []
 		},
 		{
-			"name": "/unauthorized (submit /login)",
+			"name": "(web-2) /unauthorized (submit /login)",
 			"event": [
 				{
 					"listen": "test",
@@ -209,7 +160,13 @@
 			],
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "default"
+					}
+				],
 				"url": {
 					"raw": "{{frontend_host}}/unauthorized",
 					"host": [
@@ -223,7 +180,7 @@
 			"response": []
 		},
 		{
-			"name": "/login (redirect auth server)",
+			"name": "(web-3) /login (redirect auth server)",
 			"event": [
 				{
 					"listen": "test",
@@ -462,7 +419,18 @@
 					"type": "noauth"
 				},
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "default"
+					}
+				],
 				"body": {
 					"mode": "urlencoded",
 					"urlencoded": [
@@ -662,7 +630,18 @@
 					"type": "noauth"
 				},
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "default"
+					}
+				],
 				"body": {
 					"mode": "urlencoded",
 					"urlencoded": [
@@ -698,7 +677,7 @@
 			"response": []
 		},
 		{
-			"name": "/oauth/token (auth code)",
+			"name": "(web-4) /oauth/token (auth code)",
 			"event": [
 				{
 					"listen": "test",
@@ -724,7 +703,13 @@
 					"type": "noauth"
 				},
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "default"
+					}
+				],
 				"url": {
 					"raw": "{{frontend_host}}/login/callback?code={{auth_code}}",
 					"host": [
@@ -745,7 +730,7 @@
 			"response": []
 		},
 		{
-			"name": "/ (with cookie)",
+			"name": "(web-5) / (with cookie)",
 			"event": [
 				{
 					"listen": "test",
@@ -778,7 +763,13 @@
 			],
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "default"
+					}
+				],
 				"url": {
 					"raw": "{{frontend_host}}/",
 					"host": [
@@ -810,7 +801,13 @@
 			],
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
 				"url": {
 					"raw": "{{frontend_host}}/api/v1/data/iot-data",
 					"host": [
@@ -852,7 +849,13 @@
 			],
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
 				"url": {
 					"raw": "{{auth_host}}/status",
 					"host": [
@@ -948,17 +951,10 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"Unset global variables\", function () {",
-							"    pm.globals.unset('transaction_id');",
-							"    pm.globals.unset('auth_code');",
-							"    pm.globals.unset('access_token');",
-							"    pm.globals.unset('refresh_token');",
-							"    pm.globals.unset('csrf_token');",
-							"    pm.globals.unset('testUsername');   ",
-							"    pm.globals.unset('testUserNumber');",
-							"    pm.globals.unset('testUserNumber');",
-							"    pm.globals.unset('createdUserUuid');",
-							"});"
+							"pm.globals.unset('transaction_id');",
+							"pm.globals.unset('auth_code');",
+							"pm.globals.unset('csrf_token');",
+							""
 						],
 						"type": "text/javascript"
 					}
