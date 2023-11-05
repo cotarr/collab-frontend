@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.1](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.1) 2023-11-04
+
+Updated the passport configuration object by adding `state=true`.
+This configuration change will cause the passport middleware to 
+include a random nonce in the authorization code grant workflow
+to address CSRF risks during 302 redirects.
+
+Update codeql-analysis.yml to increment upgrade to CodeQL Action v2 for 
+github code scanning.
+
 ## [v1.0.0](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.0) 2023-07-08
 
 This edit started as a dependency update driven by GitHub dependabot dependency warning.

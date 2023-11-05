@@ -58,7 +58,8 @@ const oauth2Strategy = new OAuth2Strategy(
     clientSecret: config.oauth2.clientSecret,
     callbackURL: config.oauth2.mainURL + '/login/callback',
     passReqToCallback: false,
-    scope: config.oauth2.requestedScope
+    scope: config.oauth2.requestedScope,
+    state: true
   },
   function (accessToken, refreshToken, profile, cb) {
     if ((!(accessToken == null)) && (accessToken.length > 0)) {
