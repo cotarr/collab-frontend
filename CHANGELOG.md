@@ -16,6 +16,10 @@ to address CSRF risks during 302 redirects.
 Update codeql-analysis.yml to increment upgrade to CodeQL Action v2 for 
 github code scanning.
 
+## v1.0.2-Draft
+
+- Update all npm dependencies
+
 ## [v1.0.0](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.0) 2023-07-08
 
 This edit started as a dependency update driven by GitHub dependabot dependency warning.
