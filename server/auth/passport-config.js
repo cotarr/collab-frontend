@@ -57,11 +57,11 @@ const oauth2Strategy = new OAuth2Strategy(
     clientID: config.oauth2.clientId,
     clientSecret: config.oauth2.clientSecret,
     callbackURL: config.oauth2.mainURL + '/login/callback',
-    passReqToCallback: false,
+    passReqToCallback: true,
     scope: config.oauth2.requestedScope,
     state: true
   },
-  function (accessToken, refreshToken, profile, cb) {
+  function (req, accessToken, refreshToken, profile, cb) {
     if ((!(accessToken == null)) && (accessToken.length > 0)) {
       const ticket = {
         access_token: accessToken
@@ -77,6 +77,11 @@ const oauth2Strategy = new OAuth2Strategy(
         console.log(error.toString() || error);
         delete ticket.exp;
       }
+      // Add a timestamp property that may be used to expire sessions
+      if ((req) && (req.session)) {
+        // loginTimestamp in Unix seconds
+        req.session.loginTimestamp = Math.floor(Date.now() / 1000);
+      };
       return cb(null, { ticket });
     } else {
       const err = new Error('Invalid access_token during login');

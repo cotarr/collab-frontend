@@ -37,7 +37,6 @@ exports.server = {
 
 exports.session = {
   rollingCookie: (process.env.SESSION_SET_ROLLING_COOKIE === 'true') || false,
-  setSessionCookie: (process.env.SESSION_SET_SESSION_COOKIE === 'true') || false,
   // 604800 = 7 days (7 * 24 * 3600)
   maxAge: parseInt(process.env.SESSION_EXPIRE_SEC || '604800') * 1000,
   ttl: parseInt(process.env.SESSION_EXPIRE_SEC || '604800'),

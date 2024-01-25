@@ -28,7 +28,7 @@ const logoutHtml =
    config.oauth2.mainURL + '.' +
   '<br><br>' +
   'You may still be logged in to the authorization server at ' + config.oauth2.authURL + '. ' +
-  'You may remove your authoriztion server login by visiting the link at: ' +
+  'You may remove your authorization server login by visiting the link at: ' +
   '<a href="' + config.oauth2.authURL + '/logout">' + config.oauth2.authURL + '/logout</a>.' +
   ' ' +
   '<a href="' + config.oauth2.authURL + '/logout"><button>Auth Logout</button></a>' +

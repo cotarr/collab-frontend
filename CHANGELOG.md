@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.0.2-Draft
+
+### Added
+
+The OAuth 2.0 login process uses the modules: passport, passport-oauth2, 
+express-session, memorystore and connect-redis to manage cookies, sessions 
+and the associated session store database. In certain configurations, 
+it was possible for the session expiration time to be updated (touched) 
+with each request. In certain configurations, this could allow a cookie 
+to be treated as a rolling cookie even if configured for 
+SESSION_SET_ROLLING_COOKIE=false. This was addressed by adding an explicit 
+user login timestamp and session expiration check that is independent of 
+the session store touch and prune functions. In the case of 
+SESSION_SET_ROLLING_COOKIE=true, the new expiration check is disabled.
+
+- server/auth/passport-config.js - At user login, add user's login timestamp to session, done in passport OAuth2Strategy callback function
+- server/auth/auth-check.js - Added check for expired session
+- server/app.js - Update express-session configuration for connect-redis and memorystore 
+- server/config/index.js - Removed configuration variable SESSION_SET_SESSION_COOKIE
+- Updated README.md and example.env to remove SESSION_SET_SESSION_COOKIE
+
+- Update all npm dependencies
+
 ## [v1.0.1](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.1) 2023-11-04
 
 Updated the passport configuration object by adding `state=true`.
@@ -15,10 +38,6 @@ to address CSRF risks during 302 redirects.
 
 Update codeql-analysis.yml to increment upgrade to CodeQL Action v2 for 
 github code scanning.
-
-## v1.0.2-Draft
-
-- Update all npm dependencies
 
 ## [v1.0.0](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.0) 2023-07-08
 

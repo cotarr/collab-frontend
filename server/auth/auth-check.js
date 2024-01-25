@@ -44,9 +44,25 @@ exports.check = (options) => {
   // This returns authorization middleware function
   return (req, res, next) => {
     //
+    // Unless configured as rolling cookie, deny requests to expired sessions.
+    // Different session store packages handle expiration differently.
+    // This is an explicit check independent of session store touch/prune features.
+    //
+    let expired = false;
+    if (!config.session.rollingCookie) {
+      if ((req) && (req.session) && (Object.hasOwn(req.session, 'loginTimestamp'))) {
+        // loginTimestamp in Unix seconds
+        if (Math.floor(Date.now() / 1000) > req.session.loginTimestamp + config.session.ttl) {
+          expired = true;
+        }
+      }
+    }
+
+    //
     // Authorization check: if cookie/session is invald, then deny access with status 401
     //
-    if ((!req.isAuthenticated) || (!req.isAuthenticated())) {
+    if ((expired) ||
+      (!req.isAuthenticated) || (!req.isAuthenticated())) {
       if ((_options.redirectURL) && (_options.redirectURL.length > 0)) {
         if (req.session) {
           if ((req._parsedOriginalUrl) && (req._parsedOriginalUrl.pathname)) {

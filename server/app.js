@@ -140,17 +140,12 @@ const sessionOptions = {
   secret: config.session.secret,
   cookie: {
     path: '/',
-    maxAge: null,
+    maxAge: config.session.maxAge,
     secure: config.server.tls,
     httpOnly: true,
     sameSite: 'Lax'
   }
 };
-// Session cookie clears when browser is closed.
-if (!config.session.setSessionCookie) {
-  // express-session takes cookie.maxAge in milliseconds
-  sessionOptions.cookie.maxAge = config.session.maxAge;
-}
 
 const sessionStore = {};
 if (config.session.enableRedis) {
@@ -175,12 +170,11 @@ if (config.session.enableRedis) {
     });
   const redisStoreOptions = {
     client: sessionStore.redisClient,
-    prefix: config.session.redisPrefix
+    prefix: config.session.redisPrefix,
+    ttl: config.session.ttl,
+    disableTouch: (config.session.rollingCookie === false)
     // redis uses Cookie ttl for session expire, unless session cookie, (see next)
   };
-  if (config.session.setSessionCookie) {
-    redisStoreOptions.ttl = config.session.ttl;
-  }
   sessionOptions.store = new sessionStore.RedisStore(redisStoreOptions);
 } else {
   console.log('Using memorystore for session storage');
@@ -188,7 +182,7 @@ if (config.session.enableRedis) {
   sessionOptions.store = new sessionStore.MemoryStore({
     // memorystore in milliseconds
     ttl: config.session.maxAge,
-    stale: true,
+    stale: false,
     // Memorystore takes prune time in milliseconds
     checkPeriod: config.session.pruneInterval * 1000
   });
@@ -221,13 +215,17 @@ app.get('/unauthorized.css', unAuthRoute.unAuthStyles);
 app.get('/login', passport.authenticate('oauth2'));
 //
 // Authorization callback route
-// Return /login/callback to exchange authoriztion code for access token.
+// Return /login/callback to exchange authorization code for access token.
 // See below for /redirect.html
 // An auth server redirect back with "/login/callback?error=access_denied"
 // will issue standard 401 Unauthorized unless failureRedirect URL is defined.
 //
 app.get('/login/callback',
-  passport.authenticate('oauth2'),
+  passport.authenticate('oauth2',
+    {
+      keepSessionInfo: true
+    }
+  ),
   (req, res) => {
     res.redirect('/');
   }
