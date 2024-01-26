@@ -9,6 +9,22 @@ and this project adheres to
 
 ## v1.0.3-Dev
 
+### Added
+
+Added IP address based network rate limit
+
+The GitHub CodeQL code analysis tool has been generating warnings that this
+web server is lacking a network rate limiter. The npm package express-rate-limit
+was added to quite the CodeQL warnings. As an arbitrary limit the default
+was set to 100 request per 5 minutes, but it can be adjusted in the configuration.
+
+- package-json - Added npm package express-rate-limit
+- server/config/index.js - Added configuration environment variables LIMITS_WEB_RATE_LIMIT_COUNT, LIMITS_WEB_RATE_LIMIT_MS
+- Updated README.md and example.env to show new environment configuration variables.
+- server/app.js added IP address rate limiter using express-rate-limit for all routes.
+
+### Convert Postman to Thunder Client.
+
 The Postman desktop client has deprecated the scratch pad feature.
 It is no longer possible to operate Postman using local files.
 

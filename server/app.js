@@ -22,6 +22,7 @@ const csrfProtection = csrf({ cookie: false });
 const compression = require('compression');
 const app = express();
 const passport = require('passport');
+const rateLimit = require('express-rate-limit');
 const logout = require('./auth/logout');
 const unAuthRoute = require('./auth/unauth-route');
 
@@ -117,6 +118,19 @@ app.use(helmet({
 
 // Route: /status    Is the server alive?
 app.get('/status', (req, res) => res.json({ status: 'ok' }));
+
+/**
+ * Middleware IP rate limiter for token API routes
+ */
+const webRateLimit = rateLimit({
+  windowMs: config.limits.webRateLimitTimeMs,
+  max: config.limits.webRateLimitCount,
+  statusCode: 429,
+  message: 'Too many requests',
+  standardHeaders: false,
+  legacyHeaders: false
+});
+app.use(webRateLimit);
 
 // Route for security.txt
 app.get('/.well-known/security.txt', securityContact);

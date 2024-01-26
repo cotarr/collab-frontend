@@ -57,7 +57,11 @@ exports.oauth2 = {
   authURL: process.env.OAUTH2_AUTH_URL || 'http://127.0.0.1:3500',
   requestedScope: JSON.parse(process.env.OAUTH2_REQUESTED_SCOPE ||
     '["api.read", "api.write"]')
+};
 
+exports.limits = {
+  webRateLimitCount: parseInt(process.env.LIMITS_WEB_RATE_LIMIT_COUNT || '100'),
+  webRateLimitTimeMs: parseInt(process.env.LIMITS_WEB_RATE_LIMIT_MS || '300000')
 };
 
 exports.remote = {
