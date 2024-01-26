@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## v1.0.3-Dev
+
+The Postman desktop client has deprecated the scratch pad feature.
+It is no longer possible to operate Postman using local files.
+
+The VSCode extension Thunder Client was selected as a replacement.
+The postman collections have been converted to Thunder Client format.
+Instructions for the new collections are in thunderclient/README.md
+
+The legacy postman collections can be found in the "postman/" folder in commit 
+653ce72aa53758c61c2cd8d4274de1466f9a08d8 from 2024-01-25.
+
 ## [v1.0.2](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.2) 2024-01-25
 
 ### Added
