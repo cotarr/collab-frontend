@@ -7,6 +7,10 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [v1.0.4](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.4) 2024-04-03
+
+- Update express to v4.19.2 to address npm audit security warning
+
 ## [v1.0.3](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.3) 2024-01-27
 
 ### Added
