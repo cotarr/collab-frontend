@@ -7,6 +7,13 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## Next
+
+Updated the following packages to clear GitHub dependabot alert for npm 
+audit security warnings: express@4.21.0, express-http-proxy@2.1.1, 
+express-rate-limit@7.4.0, express-session@1.18.0, passport-oauth2@1.8.0
+redis@4.7.0, rotating-file-stream@3.2.5, dotenv@16.4.5
+
 ## [v1.0.4](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.4) 2024-04-03
 
 - Update express to v4.19.2 to address npm audit security warning
