@@ -7,12 +7,17 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Next
+## [v1.0.5](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.5) 2024-09-24
 
 Updated the following packages to clear GitHub dependabot alert for npm 
 audit security warnings: express@4.21.0, express-http-proxy@2.1.1, 
 express-rate-limit@7.4.0, express-session@1.18.0, passport-oauth2@1.8.0
 redis@4.7.0, rotating-file-stream@3.2.5, dotenv@16.4.5
+
+Removed thunderclient API test collection because recent 
+paywall changes have rendered the tests inoperable in the free version.
+The legacy files are available by rolling collab-frontend back 
+to commit 90efc3ae50c5f1521fe12b955569838ae678c57c.
 
 ## [v1.0.4](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.4) 2024-04-03
 
