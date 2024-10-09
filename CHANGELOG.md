@@ -10,6 +10,8 @@ and this project adheres to
 
 - Update packages for npm audit warning: @dr.pogodin/csurf@1.14.0, express@4.21.1, express-rate-limit@7.4.1, express-session@1.18.1, helmet@8.0.0
 
+- Upgrade eslint from version 8 to version 9
+
 ## [v1.0.5](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.5) 2024-09-24
 
 Updated the following packages to clear GitHub dependabot alert for npm 
