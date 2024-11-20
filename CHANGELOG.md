@@ -9,6 +9,17 @@ and this project adheres to
 
 ## Next
 
+- Removed npm package eslint.
+- Deleted the eslint.config.mjs configuration file for eslint.
+- Remove lint command from package.json
+- Delete and regenerate package-lock.json
+
+- There were no code changes in this commit.
+
+The intent behind removing eslint is to eliminate future GitHub notifications for outdated development dependencies.
+
+- Update npm dependency: compression@1.7.5
+
 - Update GitHub CodeQL yml configuration file to level @v3
 
 ## [v1.0.6](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.6) 2024-10-09

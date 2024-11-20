@@ -4,7 +4,6 @@
   "description": "Demo web server used on a collaboration project for learning oauth2orize and passport",
   "main": "bin/www",
   "scripts": {
-    "lint": "npx eslint server bin/www secure/js",
     "start": "node bin/www"
   },
   "repository": {
@@ -19,7 +18,7 @@
   "homepage": "https://github.com/cotarr/collab-frontend#readme",
   "dependencies": {
     "@dr.pogodin/csurf": "^1.14.0",
-    "compression": "^1.7.4",
+    "compression": "^1.7.5",
     "connect-redis": "^7.1.1",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
@@ -33,10 +32,5 @@
     "passport-oauth2": "^1.8.0",
     "redis": "^4.7.0",
     "rotating-file-stream": "^3.2.5"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.12.0",
-    "eslint": "^9.12.0",
-    "globals": "^15.11.0"
   }
 }
