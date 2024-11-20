@@ -7,7 +7,7 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Next
+## [v1.0.7](https://github.com/cotarr/collab-frontend/releases/tag/v1.0.7) 2024-11-20
 
 - Removed npm package eslint.
 - Deleted the eslint.config.mjs configuration file for eslint.
