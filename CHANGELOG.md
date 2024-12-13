@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+- Update express@4.21.2 to address npm audit warning
+- Update npm dependencies to latest
 - Update connect-redis as major revision v7 to v8
 - server/app.js update module require() for connect-redis for compatibility with v8.
 
